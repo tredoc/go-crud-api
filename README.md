@@ -27,13 +27,13 @@
 
 ## ✅Flow:
 ```
-[ ] Init module  
+[X] Add gitignore
+[X] Init module  
 [ ] Design a schema for a relational database with dbdiagram.io  
 [ ] Add basic server  
 [ ] Add Slog logger  
 [ ] Mock route handlers for Books CRUD  
 [ ] Add postgresql repository  
-[ ] Add basic docker-compose
 [ ] Dockerize the go app and postgresql  
 [ ] Add configuration  
 [ ] Add migration  
