@@ -24,12 +24,15 @@
 - Automatic testing through Postman
 - Unit tests
 
+---
+💡Check docs dir for more info about db schema. 
+Feel free to insert db schema from txt file to dbdiagram.io to see it in a more convenient way.
 
 ## ✅Flow:
 ```
 [X] Add gitignore
 [X] Init module  
-[ ] Design a schema for a relational database with dbdiagram.io  
+[X] Design a schema for a relational database with dbdiagram.io  
 [ ] Add basic server  
 [ ] Add Slog logger  
 [ ] Mock route handlers for Books CRUD  

@@ -1,0 +1,38 @@
+Table books as b {
+  id bigserial [pk]
+  title varchar(255) [not null]
+  piblish_date date [not null]
+  added_at date [default: `now()`]
+  ISBN varchar(100) [not null]
+  pages smallint [not null]
+}
+
+Table authors as a {
+  id bigserial [pk]
+  first_name varchar(100) [not null]
+  middle_name varchar(100)
+  last_name varchar(100) [not null]
+}
+
+Table genres as g {
+  id bigserial [pk]
+  name varchar(100) [not null]
+}
+
+Table book_genre {
+  book_id bigint [ref: > b.id, not null]
+  genre_id bigint [ref: > g.id, not null]
+
+  Indexes {
+    (book_id, genre_id) [unique]
+  }
+}
+
+Table book_author {
+  book_id bigint [ref: > b.id, not null]
+  author_id bigint [ref: > a.id, not null]
+
+  Indexes {
+    (book_id, author_id) [unique]
+  }
+}
