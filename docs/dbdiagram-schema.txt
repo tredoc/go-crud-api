@@ -2,7 +2,7 @@ Table books as b {
   id bigserial [pk]
   title varchar(255) [not null]
   piblish_date date [not null]
-  added_at date [default: `now()`]
+  created_at datetime [default: `now()`]
   ISBN varchar(100) [not null]
   pages smallint [not null]
 }
