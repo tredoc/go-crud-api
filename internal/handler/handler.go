@@ -1,14 +1,26 @@
 package handler
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"github.com/julienschmidt/httprouter"
+	"github.com/tredoc/go-crud-api/internal/service"
+	"net/http"
+)
 
-type Handler struct {
-	book *BookHandler
+type Book interface {
+	CreateBook(w http.ResponseWriter, _ *http.Request, _ httprouter.Params)
+	GetBookByID(w http.ResponseWriter, _ *http.Request, _ httprouter.Params)
+	GetAllBooks(w http.ResponseWriter, _ *http.Request, _ httprouter.Params)
+	UpdateBook(w http.ResponseWriter, _ *http.Request, _ httprouter.Params)
+	DeleteBook(w http.ResponseWriter, _ *http.Request, _ httprouter.Params)
 }
 
-func NewHandler() *Handler {
+type Handler struct {
+	book Book
+}
+
+func NewHandler(services *service.Service) *Handler {
 	return &Handler{
-		book: NewBookHandler(),
+		book: NewBookHandler(services.Book),
 	}
 }
 

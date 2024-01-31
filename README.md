@@ -36,7 +36,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [X] Add basic server  
 [X] Add Slog logger  
 [X] Mock route handlers for Books CRUD  
-[ ] Add postgresql repository  
+[X] Add repository  
 [ ] Dockerize the go app and postgresql  
 [ ] Add configuration  
 [ ] Add migration  
