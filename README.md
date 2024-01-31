@@ -33,7 +33,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [X] Add gitignore
 [X] Init module  
 [X] Design a schema for a relational database with dbdiagram.io  
-[ ] Add basic server  
+[X] Add basic server  
 [ ] Add Slog logger  
 [ ] Mock route handlers for Books CRUD  
 [ ] Add postgresql repository  
