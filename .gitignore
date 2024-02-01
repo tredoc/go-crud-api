@@ -3,3 +3,6 @@
 
 # Compiled files
 /bin
+
+# Environment files
+.env

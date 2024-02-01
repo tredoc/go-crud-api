@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: "book-crud-db"
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - app-network
+    volumes:
+      - database_postgres:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: "book-crud-app"
+    environment:
+      DB_TYPE: ${DB_TYPE}
+      DB_HOST: ${DB_HOST}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      SSL_MODE: ${SSL_MODE}
+    ports:
+      - "8080:${PORT}"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  database_postgres:
+
+networks:
+  app-network:
+    driver: bridge
