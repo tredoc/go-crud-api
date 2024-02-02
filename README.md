@@ -53,7 +53,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [ ] Add registration and authentication    
 [ ] Add authorization  
 [ ] Add unit tests  
-[ ] Add cashing with Redis  
+[ ] Add caching with Redis  
 
 [X] Add auto project rebuild
 [ ] Add swagger
