@@ -1,9 +1,15 @@
 package repository
 
-type BookRepository struct{}
+import "database/sql"
 
-func NewBookRepository() *BookRepository {
-	return &BookRepository{}
+type BookRepository struct {
+	db *sql.DB
+}
+
+func NewBookRepository(db *sql.DB) *BookRepository {
+	return &BookRepository{
+		db: db,
+	}
 }
 
 func (r *BookRepository) CreateBook() (string, error) {

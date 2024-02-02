@@ -1,5 +1,7 @@
 package repository
 
+import "database/sql"
+
 type Book interface {
 	CreateBook() (string, error)
 	GetBookByID() (string, error)
@@ -12,8 +14,8 @@ type Repository struct {
 	Book Book
 }
 
-func NewRepository() *Repository {
+func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
-		Book: NewBookRepository(),
+		Book: NewBookRepository(db),
 	}
 }
