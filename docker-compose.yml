@@ -32,6 +32,8 @@ services:
       - db
     networks:
       - app-network
+    volumes:
+      - ./:/app
 
 volumes:
   database_postgres:

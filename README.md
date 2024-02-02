@@ -55,7 +55,8 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [ ] Add unit tests  
 [ ] Add cashing with Redis  
 
-[ ] Add auto project rebuild
+[X] Add auto project rebuild
+[ ] Add swagger
 
 To Be Continued...
 ```

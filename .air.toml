@@ -1,0 +1,27 @@
+# .air.toml
+[build]
+cmd = "go build -o ./bin/app ./cmd/app"
+bin = "bin/app"
+full_bin = "APP_ENV=development ./bin/app"
+
+[watch]
+includes = [
+  "app/**/*"
+]
+excludes = [
+  "assets",
+  "tmp",
+  "vendor"
+]
+
+[log]
+level = "debug"
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+clean_on_exit = true
