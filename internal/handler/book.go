@@ -22,8 +22,9 @@ func NewBookHandler(service service.Book) *BookHandler {
 }
 
 func (h *BookHandler) CreateBook(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	res, _ := h.service.CreateBook()
-	_, _ = fmt.Fprintf(w, res)
+	//ctx := r.Context()
+	//res, _ := h.service.CreateBook(ctx, &types.Book{})
+	_, _ = fmt.Fprint(w, "create book")
 }
 
 func (h *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -34,7 +35,7 @@ func (h *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || id < 0 {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
