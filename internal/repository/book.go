@@ -1,6 +1,10 @@
 package repository
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+	"github.com/tredoc/go-crud-api/pkg/types"
+)
 
 type BookRepository struct {
 	db *sql.DB
@@ -12,16 +16,16 @@ func NewBookRepository(db *sql.DB) *BookRepository {
 	}
 }
 
-func (r *BookRepository) CreateBook() (string, error) {
-	return "create book", nil
+func (r *BookRepository) CreateBook(ctx context.Context, book *types.Book) (int64, error) {
+	return 0, nil
 }
 
-func (r *BookRepository) GetBookByID() (string, error) {
-	return "get book by ID", nil
+func (r *BookRepository) GetBookByID(ctx context.Context, id int64) (*types.Book, error) {
+	return &types.Book{}, nil
 }
 
-func (r *BookRepository) GetAllBooks() (string, error) {
-	return "get All Books", nil
+func (r *BookRepository) GetAllBooks(ctx context.Context) ([]*types.Book, error) {
+	return []*types.Book{&types.Book{}}, nil
 }
 
 func (r *BookRepository) UpdateBook() (string, error) {

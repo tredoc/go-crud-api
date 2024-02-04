@@ -47,9 +47,15 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [X] Dockerize the go app and postgresql  
 [X] Add configuration  
 [X] Add migration  
-[ ] Finish CRUD handlers
-    [ ] validate input json  
-    [ ] unify error responses  
+[_] Finish CRUD handlers
+    [_] add author repository and service methods
+    [ ] finish author transport methods
+    [_] add genre repository and service methods
+    [ ] finish genre transport methods
+    [_] add book repository and service methods
+    [ ] finish book transport methods
+    [ ] add json validation  
+    [ ] add error responses & logging
 [ ] Add registration and authentication    
 [ ] Add authorization  
 [ ] Add unit tests  
