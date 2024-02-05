@@ -23,6 +23,7 @@ type Author interface {
 
 type Genre interface {
 	CreateGenre(context.Context, *types.Genre) (int64, error)
+	GetGenreByID(context.Context, int64) (*types.Genre, error)
 	GetAllGenres(context.Context) ([]*types.Genre, error)
 }
 

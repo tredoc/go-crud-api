@@ -50,7 +50,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [_] Finish CRUD handlers
     [_] add author repository and service methods
     [ ] finish author transport methods
-    [_] add genre repository and service methods
+    [X] add genre repository and service methods
     [ ] finish genre transport methods
     [_] add book repository and service methods
     [ ] finish book transport methods
@@ -61,7 +61,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [ ] Add unit tests  
 [ ] Add caching with Redis  
 
-[X] Add auto project rebuild
+[X] Add project auto rebuild
 [ ] Add swagger
 
 To Be Continued...
