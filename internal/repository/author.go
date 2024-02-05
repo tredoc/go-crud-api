@@ -23,7 +23,7 @@ func (r *AuthorRepository) CreateAuthor(ctx context.Context, author *types.Autho
 
 	var foundAuthorID int64
 	err := row.Scan(&foundAuthorID)
-	if err != nil && !errors.Is(row.Err(), sql.ErrNoRows) {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return 0, err
 	}
 
@@ -48,7 +48,7 @@ func (r *AuthorRepository) GetAuthorByID(ctx context.Context, id int64) (*types.
 	var author types.Author
 	err := row.Scan(&author.ID, &author.FirstName, &author.MiddleName, &author.LastName)
 	if err != nil {
-		if errors.Is(row.Err(), sql.ErrNoRows) {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
 		return nil, err

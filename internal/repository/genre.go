@@ -20,11 +20,7 @@ func (r *GenreRepository) CreateGenre(ctx context.Context, genre *types.Genre) (
 	stmt := `INSERT INTO genres (name) VALUES ($1) RETURNING id`
 	var id int64
 	err := r.db.QueryRowContext(ctx, stmt, genre.Name).Scan(&id)
-	if err != nil {
-		return 0, err
-	}
-
-	return id, nil
+	return id, err
 }
 
 func (r *GenreRepository) GetGenreByID(ctx context.Context, id int64) (*types.Genre, error) {

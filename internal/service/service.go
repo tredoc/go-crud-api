@@ -11,7 +11,7 @@ type Book interface {
 	GetBookByID(context.Context, int64) (*types.Book, error)
 	GetAllBooks(context.Context) ([]*types.Book, error)
 	UpdateBook() (string, error)
-	DeleteBook() (string, error)
+	DeleteBook(context.Context, int64) error
 }
 
 type Author interface {

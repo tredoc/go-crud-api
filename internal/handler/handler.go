@@ -6,6 +6,12 @@ import (
 	"net/http"
 )
 
+var (
+	idParam        string = "id"
+	firstNameParam string = "first_name"
+	lastNameParam  string = "last_name"
+)
+
 type Book interface {
 	CreateBook(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetBookByID(http.ResponseWriter, *http.Request, httprouter.Params)
@@ -20,15 +26,24 @@ type Genre interface {
 	GetAllGenres(http.ResponseWriter, *http.Request, httprouter.Params)
 }
 
+type Author interface {
+	CreateAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
+	GetAuthorByID(http.ResponseWriter, *http.Request, httprouter.Params)
+	GetAuthorByName(http.ResponseWriter, *http.Request, httprouter.Params)
+	GetAllAuthors(http.ResponseWriter, *http.Request, httprouter.Params)
+}
+
 type Handler struct {
-	book  Book
-	genre Genre
+	book   Book
+	genre  Genre
+	author Author
 }
 
 func NewHandler(services *service.Service) *Handler {
 	return &Handler{
-		book:  NewBookHandler(services.Book),
-		genre: NewGenreHandler(services.Genre),
+		book:   NewBookHandler(services.Book),
+		genre:  NewGenreHandler(services.Genre),
+		author: NewAuthorHandler(services.Author),
 	}
 }
 
@@ -44,6 +59,10 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 	router.GET("/api/v1/genres", h.genre.GetAllGenres)
 	router.GET("/api/v1/genres/:id", h.genre.GetGenreByID)
 	router.POST("/api/v1/genres", h.genre.CreateGenre)
+
+	router.POST("/api/v1/authors", h.author.CreateAuthor)
+	router.GET("/api/v1/authors", h.author.GetAllAuthors)
+	router.GET("/api/v1/authors/:id", h.author.GetAuthorByID)
 
 	return router
 }

@@ -57,6 +57,6 @@ func (s *BookService) UpdateBook() (string, error) {
 	return s.repo.UpdateBook()
 }
 
-func (s *BookService) DeleteBook() (string, error) {
-	return s.repo.DeleteBook()
+func (s *BookService) DeleteBook(ctx context.Context, id int64) error {
+	return s.repo.DeleteBook(ctx, id)
 }
