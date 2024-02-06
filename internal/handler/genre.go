@@ -137,3 +137,31 @@ func (h *GenreHandler) UpdateGenre(w http.ResponseWriter, r *http.Request, ps ht
 
 	_, _ = fmt.Fprint(w, string(resp))
 }
+
+func (h *GenreHandler) DeleteGenre(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	idStr := ps.ByName(idParam)
+	if idStr == "" {
+		http.Error(w, "missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 0 {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	err = h.service.DeleteGenre(ctx, id)
+	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			http.Error(w, "no genre with such id", http.StatusBadRequest)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}

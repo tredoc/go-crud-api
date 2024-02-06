@@ -25,6 +25,7 @@ type Genre interface {
 	GetGenreByID(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetAllGenres(http.ResponseWriter, *http.Request, httprouter.Params)
 	UpdateGenre(http.ResponseWriter, *http.Request, httprouter.Params)
+	DeleteGenre(http.ResponseWriter, *http.Request, httprouter.Params)
 }
 
 type Author interface {
@@ -61,6 +62,7 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 	router.GET("/api/v1/genres", h.genre.GetAllGenres)
 	router.GET("/api/v1/genres/:id", h.genre.GetGenreByID)
 	router.PATCH("/api/v1/genres/:id", h.genre.UpdateGenre)
+	router.DELETE("/api/v1/genres/:id", h.genre.DeleteGenre)
 
 	router.POST("/api/v1/authors", h.author.CreateAuthor)
 	router.GET("/api/v1/authors", h.author.GetAllAuthors)

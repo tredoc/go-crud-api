@@ -46,7 +46,7 @@ func (r *BookRepository) CreateBook(ctx context.Context, book *types.CreateBook)
 			return bookID, createdAt, err
 		}
 
-		if rowsAffected < 0 {
+		if rowsAffected == 0 {
 			return bookID, createdAt, errors.New("no rows affected on book_author relation create")
 		}
 	}

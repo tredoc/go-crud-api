@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"strings"
@@ -74,10 +75,9 @@ func (r *GenreRepository) GetAllGenres(ctx context.Context) ([]*types.Genre, err
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
-	var genres []*types.Genre
 
+	var genres []*types.Genre
 	for rows.Next() {
 		var genre types.Genre
 		err := rows.Scan(&genre.ID, &genre.Name)
@@ -107,4 +107,45 @@ func (r *GenreRepository) UpdateGenre(ctx context.Context, id int64, genre *type
 	}
 
 	return nil
+}
+
+func (r *GenreRepository) DeleteGenre(ctx context.Context, id int64) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt := `DELETE FROM book_genre WHERE genre_id = $1`
+	res, err := tx.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("no rows affected on book_author relation delete")
+	}
+
+	stmt = `DELETE FROM genres WHERE id = $1`
+	res, err = tx.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("no rows affected on genre delete")
+	}
+
+	err = tx.Commit()
+	return err
 }

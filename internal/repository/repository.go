@@ -15,6 +15,15 @@ type Book interface {
 	DeleteBook(context.Context, int64) error
 }
 
+type Genre interface {
+	CreateGenre(context.Context, *types.Genre) (int64, error)
+	GetGenreByID(context.Context, int64) (*types.Genre, error)
+	GetGenresByIDs(context.Context, []int64) ([]*types.Genre, error)
+	GetAllGenres(context.Context) ([]*types.Genre, error)
+	UpdateGenre(context.Context, int64, *types.Genre) error
+	DeleteGenre(context.Context, int64) error
+}
+
 type Author interface {
 	CreateAuthor(context.Context, *types.Author) (int64, error)
 	GetAuthorByID(context.Context, int64) (*types.Author, error)
@@ -23,24 +32,16 @@ type Author interface {
 	GetAllAuthors(context.Context) ([]*types.Author, error)
 }
 
-type Genre interface {
-	CreateGenre(context.Context, *types.Genre) (int64, error)
-	GetGenreByID(context.Context, int64) (*types.Genre, error)
-	GetGenresByIDs(context.Context, []int64) ([]*types.Genre, error)
-	GetAllGenres(context.Context) ([]*types.Genre, error)
-	UpdateGenre(context.Context, int64, *types.Genre) error
-}
-
 type Repository struct {
 	Book
-	Author
 	Genre
+	Author
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		Book:   NewBookRepository(db),
-		Author: NewAuthorRepository(db),
 		Genre:  NewGenreRepository(db),
+		Author: NewAuthorRepository(db),
 	}
 }

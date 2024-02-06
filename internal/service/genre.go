@@ -91,3 +91,16 @@ func (s *GenreService) UpdateGenre(ctx context.Context, id int64, genre *types.G
 	}
 	return nil
 }
+
+func (s *GenreService) DeleteGenre(ctx context.Context, id int64) error {
+	err := s.repo.DeleteGenre(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return ErrNotFound
+		}
+
+		return err
+	}
+
+	return nil
+}
