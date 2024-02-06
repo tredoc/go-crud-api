@@ -48,7 +48,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [X] Add configuration  
 [X] Add migration  
 [_] Finish CRUD handlers
-    [_] add author repository and service methods
+    [X] add author repository and service methods
     [ ] finish author transport methods
     [X] add genre repository and service methods
     [ ] finish genre transport methods
