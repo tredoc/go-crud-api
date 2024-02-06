@@ -24,8 +24,10 @@ func (s *GenreService) CreateGenre(ctx context.Context, genre *types.Genre) (*ty
 		return nil, err
 	}
 
+	genre.Name = strings.ToLower(genre.Name)
+
 	for _, g := range genres {
-		if g.Name == strings.ToLower(genre.Name) {
+		if genre.Name == g.Name {
 			return g, ErrEntityExists
 		}
 	}
@@ -76,4 +78,16 @@ func (s *GenreService) GetAllGenres(ctx context.Context) ([]*types.Genre, error)
 	}
 
 	return genres, nil
+}
+
+func (s *GenreService) UpdateGenre(ctx context.Context, id int64, genre *types.Genre) error {
+	genre.Name = strings.ToLower(genre.Name)
+	err := s.repo.UpdateGenre(ctx, id, genre)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return ErrNotFound
+		}
+		return err
+	}
+	return nil
 }

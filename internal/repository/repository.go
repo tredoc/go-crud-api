@@ -28,6 +28,7 @@ type Genre interface {
 	GetGenreByID(context.Context, int64) (*types.Genre, error)
 	GetGenresByIDs(context.Context, []int64) ([]*types.Genre, error)
 	GetAllGenres(context.Context) ([]*types.Genre, error)
+	UpdateGenre(context.Context, int64, *types.Genre) error
 }
 
 type Repository struct {

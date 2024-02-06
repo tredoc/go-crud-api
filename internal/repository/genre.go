@@ -89,3 +89,22 @@ func (r *GenreRepository) GetAllGenres(ctx context.Context) ([]*types.Genre, err
 
 	return genres, nil
 }
+
+func (r *GenreRepository) UpdateGenre(ctx context.Context, id int64, genre *types.Genre) error {
+	stmt := `UPDATE genres SET name = $1 WHERE id = $2`
+	res, err := r.db.ExecContext(ctx, stmt, genre.Name, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}

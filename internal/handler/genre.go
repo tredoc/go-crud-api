@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
@@ -31,6 +32,10 @@ func (h *GenreHandler) CreateGenre(w http.ResponseWriter, r *http.Request, _ htt
 	ctx := r.Context()
 	res, err := h.service.CreateGenre(ctx, &genre)
 	if err != nil {
+		if errors.Is(err, service.ErrEntityExists) {
+			http.Error(w, "genre already exists", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -86,5 +91,49 @@ func (h *GenreHandler) GetAllGenres(w http.ResponseWriter, r *http.Request, _ ht
 	}
 
 	resp, err := json.Marshal(genres)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, _ = fmt.Fprint(w, string(resp))
+}
+
+func (h *GenreHandler) UpdateGenre(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	idStr := ps.ByName(idParam)
+	if idStr == "" {
+		http.Error(w, "missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 0 {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var genre types.Genre
+	err = json.NewDecoder(r.Body).Decode(&genre)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	err = h.service.UpdateGenre(ctx, id, &genre)
+	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			http.Error(w, "no genre with such id", http.StatusBadRequest)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := json.Marshal(genre)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	_, _ = fmt.Fprint(w, string(resp))
 }

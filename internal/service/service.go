@@ -26,6 +26,7 @@ type Genre interface {
 	CreateGenre(context.Context, *types.Genre) (*types.Genre, error)
 	GetGenreByID(context.Context, int64) (*types.Genre, error)
 	GetAllGenres(context.Context) ([]*types.Genre, error)
+	UpdateGenre(context.Context, int64, *types.Genre) error
 }
 
 type Service struct {
