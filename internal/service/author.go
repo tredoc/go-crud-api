@@ -44,6 +44,19 @@ func (s *AuthorService) GetAuthorByID(ctx context.Context, id int64) (*types.Aut
 	return author, nil
 }
 
+func (s *AuthorService) GetAuthorsByIDs(ctx context.Context, ids []int64) ([]*types.Author, error) {
+	authors, err := s.repo.GetAuthorsByIDs(ctx, ids)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return authors, nil
+		}
+
+		return nil, err
+	}
+
+	return authors, nil
+}
+
 func (s *AuthorService) GetAuthorByName(ctx context.Context, firstName string, lastName string) (*types.Author, error) {
 	author, err := s.repo.GetAuthorByName(ctx, firstName, lastName)
 	if err != nil {

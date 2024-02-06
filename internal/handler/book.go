@@ -21,15 +21,15 @@ func NewBookHandler(service service.Book) *BookHandler {
 }
 
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var book types.Book
-	err := json.NewDecoder(r.Body).Decode(&book)
+	var newBook types.CreateBook
+	err := json.NewDecoder(r.Body).Decode(&newBook)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	ctx := r.Context()
-	res, err := h.service.CreateBook(ctx, &book)
+	res, err := h.service.CreateBook(ctx, &newBook)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

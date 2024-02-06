@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/tredoc/go-crud-api/pkg/types"
+	"strings"
 )
 
 type GenreRepository struct {
@@ -32,7 +34,38 @@ func (r *GenreRepository) GetGenreByID(ctx context.Context, id int64) (*types.Ge
 	}
 
 	return &genre, nil
+}
 
+func (r *GenreRepository) GetGenresByIDs(ctx context.Context, ids []int64) ([]*types.Genre, error) {
+	placeholders := make([]string, len(ids))
+	for idx := range ids {
+		placeholders[idx] = fmt.Sprintf("$%d", idx+1)
+	}
+
+	placeholder := strings.Join(placeholders, ",")
+	stmt := fmt.Sprintf(`SELECT id, name FROM genres WHERE id IN (%s)`, placeholder)
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		args[i] = id
+	}
+	rows, err := r.db.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var genres []*types.Genre
+	for rows.Next() {
+		var genre types.Genre
+		err := rows.Scan(&genre.ID, &genre.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		genres = append(genres, &genre)
+	}
+
+	return genres, nil
 }
 
 func (r *GenreRepository) GetAllGenres(ctx context.Context) ([]*types.Genre, error) {

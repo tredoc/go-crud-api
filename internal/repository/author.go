@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/tredoc/go-crud-api/pkg/types"
+	"strings"
 )
 
 type AuthorRepository struct {
@@ -55,6 +57,38 @@ func (r *AuthorRepository) GetAuthorByID(ctx context.Context, id int64) (*types.
 	}
 
 	return &author, nil
+}
+
+func (r *AuthorRepository) GetAuthorsByIDs(ctx context.Context, ids []int64) ([]*types.Author, error) {
+	placeholders := make([]string, len(ids))
+	for idx := range ids {
+		placeholders[idx] = fmt.Sprintf("$%d", idx+1)
+	}
+
+	placeholder := strings.Join(placeholders, ",")
+	stmt := fmt.Sprintf("SELECT id, first_name, middle_name, last_name FROM authors WHERE id IN (%s)", placeholder)
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		args[i] = id
+	}
+	rows, err := r.db.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var authors []*types.Author
+	for rows.Next() {
+		var author types.Author
+		err := rows.Scan(&author.ID, &author.FirstName, &author.MiddleName, &author.LastName)
+		if err != nil {
+			return nil, err
+		}
+
+		authors = append(authors, &author)
+	}
+
+	return authors, nil
 }
 
 func (r *AuthorRepository) GetAuthorByName(ctx context.Context, firstName string, lastName string) (*types.Author, error) {

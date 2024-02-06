@@ -7,18 +7,19 @@ import (
 )
 
 type Book interface {
-	CreateBook(context.Context, *types.Book) (*types.Book, error)
-	GetBookByID(context.Context, int64) (*types.Book, error)
+	CreateBook(context.Context, *types.CreateBook) (*types.BookWithDetails, error)
+	GetBookByID(context.Context, int64) (*types.BookWithDetails, error)
 	GetAllBooks(context.Context) ([]*types.Book, error)
 	UpdateBook() (string, error)
 	DeleteBook(context.Context, int64) error
 }
 
 type Author interface {
-	CreateAuthor(ctx context.Context, author *types.Author) (*types.Author, error)
-	GetAuthorByID(ctx context.Context, id int64) (*types.Author, error)
-	GetAuthorByName(ctx context.Context, firstName string, lastName string) (*types.Author, error)
-	GetAllAuthors(ctx context.Context) ([]*types.Author, error)
+	CreateAuthor(context.Context, *types.Author) (*types.Author, error)
+	GetAuthorByID(context.Context, int64) (*types.Author, error)
+	GetAuthorsByIDs(context.Context, []int64) ([]*types.Author, error)
+	GetAuthorByName(context.Context, string, string) (*types.Author, error)
+	GetAllAuthors(context.Context) ([]*types.Author, error)
 }
 
 type Genre interface {
@@ -35,7 +36,7 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Book:   NewBookService(repos.Book),
+		Book:   NewBookService(repos.Book, repos.Author, repos.Genre),
 		Author: NewAuthorService(repos.Author),
 		Genre:  NewGenreService(repos.Genre),
 	}

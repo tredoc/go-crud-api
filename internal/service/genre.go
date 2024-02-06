@@ -52,6 +52,19 @@ func (s *GenreService) GetGenreByID(ctx context.Context, id int64) (*types.Genre
 	return genre, nil
 }
 
+func (s *GenreService) GetGenresByIDs(ctx context.Context, ids []int64) ([]*types.Genre, error) {
+	genres, err := s.repo.GetGenresByIDs(ctx, ids)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return genres, nil
+		}
+
+		return nil, err
+	}
+
+	return genres, nil
+}
+
 func (s *GenreService) GetAllGenres(ctx context.Context) ([]*types.Genre, error) {
 	genres, err := s.repo.GetAllGenres(ctx)
 	if err != nil {
