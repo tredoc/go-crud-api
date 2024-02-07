@@ -82,3 +82,29 @@ func (s *AuthorService) GetAllAuthors(ctx context.Context) ([]*types.Author, err
 
 	return authors, nil
 }
+
+func (s *AuthorService) UpdateAuthor(ctx context.Context, id int64, author *types.UpdateAuthor) (*types.Author, error) {
+	existingAuthor, err := s.repo.GetAuthorByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	if author.FirstName != nil {
+		existingAuthor.FirstName = *author.FirstName
+	}
+
+	if author.MiddleName != nil {
+		existingAuthor.MiddleName = *author.MiddleName
+	}
+
+	if author.LastName != nil {
+		existingAuthor.LastName = *author.LastName
+	}
+
+	err = s.repo.UpdateAuthor(ctx, id, existingAuthor)
+	return existingAuthor, err
+}

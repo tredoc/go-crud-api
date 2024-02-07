@@ -126,3 +126,22 @@ func (r *AuthorRepository) GetAllAuthors(ctx context.Context) ([]*types.Author, 
 	}
 	return authors, nil
 }
+
+func (r *AuthorRepository) UpdateAuthor(ctx context.Context, id int64, author *types.Author) error {
+	stmt := `UPDATE authors SET first_name = $1, middle_name = $2, last_name = $3 WHERE id = $4`
+	res, err := r.db.ExecContext(ctx, stmt, author.FirstName, author.MiddleName, author.LastName, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}

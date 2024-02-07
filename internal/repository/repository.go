@@ -30,6 +30,7 @@ type Author interface {
 	GetAuthorsByIDs(context.Context, []int64) ([]*types.Author, error)
 	GetAuthorByName(context.Context, string, string) (*types.Author, error)
 	GetAllAuthors(context.Context) ([]*types.Author, error)
+	UpdateAuthor(context.Context, int64, *types.Author) error
 }
 
 type Repository struct {

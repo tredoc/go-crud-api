@@ -33,6 +33,7 @@ type Author interface {
 	GetAuthorByID(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetAuthorByName(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetAllAuthors(http.ResponseWriter, *http.Request, httprouter.Params)
+	UpdateAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
 }
 
 type Handler struct {
@@ -67,6 +68,7 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 	router.POST("/api/v1/authors", h.author.CreateAuthor)
 	router.GET("/api/v1/authors", h.author.GetAllAuthors)
 	router.GET("/api/v1/authors/:id", h.author.GetAuthorByID)
+	router.PATCH("/api/v1/authors/:id", h.author.UpdateAuthor)
 
 	return router
 }

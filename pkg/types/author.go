@@ -6,3 +6,9 @@ type Author struct {
 	MiddleName string `json:"middle_name"`
 	LastName   string `json:"last_name"`
 }
+
+type UpdateAuthor struct {
+	FirstName  *string `json:"first_name"`
+	MiddleName *string `json:"middle_name"`
+	LastName   *string `json:"last_name"`
+}

@@ -122,3 +122,43 @@ func (h *AuthorHandler) GetAllAuthors(w http.ResponseWriter, r *http.Request, _ 
 	}
 	_, _ = w.Write(resp)
 }
+
+func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	idStr := ps.ByName(idParam)
+	if idStr == "" {
+		http.Error(w, "missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 0 {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var author types.UpdateAuthor
+	err = json.NewDecoder(r.Body).Decode(&author)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	updatedAuthor, err := h.service.UpdateAuthor(ctx, id, &author)
+	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			http.Error(w, "author not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := json.Marshal(updatedAuthor)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = w.Write(resp)
+}
