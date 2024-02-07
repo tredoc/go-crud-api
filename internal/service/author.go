@@ -108,3 +108,16 @@ func (s *AuthorService) UpdateAuthor(ctx context.Context, id int64, author *type
 	err = s.repo.UpdateAuthor(ctx, id, existingAuthor)
 	return existingAuthor, err
 }
+
+func (s *AuthorService) DeleteAuthor(ctx context.Context, id int64) error {
+	err := s.repo.DeleteAuthor(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return ErrNotFound
+		}
+
+		return err
+	}
+
+	return nil
+}

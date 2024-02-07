@@ -34,6 +34,7 @@ type Author interface {
 	GetAuthorByName(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetAllAuthors(http.ResponseWriter, *http.Request, httprouter.Params)
 	UpdateAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
+	DeleteAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
 }
 
 type Handler struct {
@@ -56,7 +57,7 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 	router.POST("/api/v1/books", h.book.CreateBook)
 	router.GET("/api/v1/books", h.book.GetAllBooks)
 	router.GET("/api/v1/books/:id", h.book.GetBookByID)
-	router.PUT("/api/v1/books/:id", h.book.UpdateBook)
+	router.PATCH("/api/v1/books/:id", h.book.UpdateBook)
 	router.DELETE("/api/v1/books/:id", h.book.DeleteBook)
 
 	router.POST("/api/v1/genres", h.genre.CreateGenre)
@@ -69,6 +70,7 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 	router.GET("/api/v1/authors", h.author.GetAllAuthors)
 	router.GET("/api/v1/authors/:id", h.author.GetAuthorByID)
 	router.PATCH("/api/v1/authors/:id", h.author.UpdateAuthor)
+	router.DELETE("/api/v1/authors/:id", h.author.DeleteAuthor)
 
 	return router
 }

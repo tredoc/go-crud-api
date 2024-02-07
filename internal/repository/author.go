@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/tredoc/go-crud-api/pkg/log"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"strings"
 )
@@ -144,4 +145,45 @@ func (r *AuthorRepository) UpdateAuthor(ctx context.Context, id int64, author *t
 	}
 
 	return nil
+}
+
+func (r *AuthorRepository) DeleteAuthor(ctx context.Context, id int64) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt := `DELETE FROM book_author WHERE author_id = $1`
+	res, err := tx.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		log.Info("no rows affected on book_author relation delete")
+	}
+
+	stmt = `DELETE FROM authors WHERE id = $1`
+	res, err = tx.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	err = tx.Commit()
+	return err
 }

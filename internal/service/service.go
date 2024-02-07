@@ -29,6 +29,7 @@ type Author interface {
 	GetAuthorByName(context.Context, string, string) (*types.Author, error)
 	GetAllAuthors(context.Context) ([]*types.Author, error)
 	UpdateAuthor(context.Context, int64, *types.UpdateAuthor) (*types.Author, error)
+	DeleteAuthor(context.Context, int64) error
 }
 
 type Service struct {

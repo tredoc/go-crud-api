@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
+	"github.com/tredoc/go-crud-api/pkg/log"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"strings"
 )
@@ -128,7 +128,7 @@ func (r *GenreRepository) DeleteGenre(ctx context.Context, id int64) error {
 	}
 
 	if rowsAffected == 0 {
-		return errors.New("no rows affected on book_author relation delete")
+		log.Info("no rows affected on book_genre relation delete")
 	}
 
 	stmt = `DELETE FROM genres WHERE id = $1`
@@ -143,7 +143,7 @@ func (r *GenreRepository) DeleteGenre(ctx context.Context, id int64) error {
 	}
 
 	if rowsAffected == 0 {
-		return errors.New("no rows affected on genre delete")
+		return ErrNotFound
 	}
 
 	err = tx.Commit()

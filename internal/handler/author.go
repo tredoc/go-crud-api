@@ -162,3 +162,30 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, ps 
 
 	_, _ = w.Write(resp)
 }
+
+func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	idStr := ps.ByName(idParam)
+	if idStr == "" {
+		http.Error(w, "missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 0 {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	err = h.service.DeleteAuthor(ctx, id)
+	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			http.Error(w, "no author with such id", http.StatusBadRequest)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
