@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
+	"github.com/tredoc/go-crud-api/internal/validator"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
 	"strconv"
@@ -26,6 +27,19 @@ func (h *GenreHandler) CreateGenre(w http.ResponseWriter, r *http.Request, _ htt
 	err := json.NewDecoder(r.Body).Decode(&genre)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	v := validator.New()
+	types.ValidateGenre(v, &genre)
+	if !v.IsValid() {
+		resp, err := json.Marshal(v.Errors)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(resp)
 		return
 	}
 
@@ -115,6 +129,19 @@ func (h *GenreHandler) UpdateGenre(w http.ResponseWriter, r *http.Request, ps ht
 	err = json.NewDecoder(r.Body).Decode(&genre)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	v := validator.New()
+	types.ValidateGenre(v, &genre)
+	if !v.IsValid() {
+		resp, err := json.Marshal(v.Errors)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(resp)
 		return
 	}
 
