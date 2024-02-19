@@ -54,7 +54,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
     [ ] finish genre transport methods
     [X] add book repository and service methods
     [ ] finish book transport methods
-    [ ] add json validation  
+    [X] add json validation  
     [ ] add error responses & logging
     [ ] add tests and refactor CRUD handlers
 [ ] Add registration and authentication    

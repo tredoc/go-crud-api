@@ -3,8 +3,11 @@ package validator
 import "regexp"
 
 var (
-	CantBeEmpty      = "can't be empty"
-	OnlyLatinLetters = "must contain only latin letters"
+	CantBeEmpty        = "can't be empty"
+	OnlyLatinLetters   = "must contain only latin letters"
+	OnlyInThePast      = "publish date can't be in future"
+	CantBeLessThanOne  = "can't be less than 1"
+	CantBeBiggerThan5k = "must be less than 5000"
 )
 
 type Validator struct {

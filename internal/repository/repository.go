@@ -8,7 +8,7 @@ import (
 )
 
 type Book interface {
-	CreateBook(ctx context.Context, book *types.CreateBook) (int64, time.Time, error)
+	CreateBook(ctx context.Context, book *types.Book) (int64, time.Time, error)
 	GetBookByID(context.Context, int64) (*types.Book, error)
 	GetAllBooks(context.Context) ([]*types.Book, error)
 	UpdateBook(context.Context, int64, *types.Book) error

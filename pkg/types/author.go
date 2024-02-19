@@ -34,7 +34,6 @@ func ValidateUpdateAuthor(v *validator.Validator, author *UpdateAuthor) {
 	if author.FirstName != nil {
 		v.Check(*author.FirstName != "", "first_name", validator.CantBeEmpty)
 		v.Check(v.Matches(*author.FirstName, regexp.MustCompile(`^[a-zA-Z]+$`)), "first_name", validator.OnlyLatinLetters)
-
 	}
 
 	if author.MiddleName != nil && *author.MiddleName != "" {

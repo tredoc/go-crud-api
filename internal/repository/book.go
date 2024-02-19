@@ -18,7 +18,7 @@ func NewBookRepository(db *sql.DB) *BookRepository {
 	}
 }
 
-func (r *BookRepository) CreateBook(ctx context.Context, book *types.CreateBook) (int64, time.Time, error) {
+func (r *BookRepository) CreateBook(ctx context.Context, book *types.Book) (int64, time.Time, error) {
 	var bookID int64
 	var createdAt time.Time
 
@@ -29,7 +29,7 @@ func (r *BookRepository) CreateBook(ctx context.Context, book *types.CreateBook)
 	defer tx.Rollback()
 
 	stmt := `INSERT INTO books(title, publish_date, isbn, pages) VALUES($1, $2, $3, $4) RETURNING id, created_at`
-	err = tx.QueryRowContext(ctx, stmt, &book.Title, &book.PublishDate, &book.ISBN, &book.Pages).Scan(&bookID, &createdAt)
+	err = tx.QueryRowContext(ctx, stmt, book.Title, book.PublishDate.Format(time.DateOnly), book.ISBN, book.Pages).Scan(&bookID, &createdAt)
 	if err != nil {
 		return bookID, createdAt, err
 	}
@@ -73,9 +73,10 @@ func (r *BookRepository) CreateBook(ctx context.Context, book *types.CreateBook)
 }
 
 func (r *BookRepository) GetBookByID(ctx context.Context, id int64) (*types.Book, error) {
+	var customDate time.Time
 	var book types.Book
 	stmt := `SELECT title, publish_date, created_at, isbn, pages FROM books WHERE id=$1`
-	err := r.db.QueryRowContext(ctx, stmt, id).Scan(&book.Title, &book.PublishDate, &book.CreatedAt, &book.ISBN, &book.Pages)
+	err := r.db.QueryRowContext(ctx, stmt, id).Scan(&book.Title, &customDate, &book.CreatedAt, &book.ISBN, &book.Pages)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
@@ -116,6 +117,7 @@ func (r *BookRepository) GetBookByID(ctx context.Context, id int64) (*types.Book
 		genres = append(genres, genreID)
 	}
 
+	book.PublishDate = types.CustomDate{Time: customDate}
 	book.Authors = authors
 	book.Genres = genres
 
@@ -124,7 +126,14 @@ func (r *BookRepository) GetBookByID(ctx context.Context, id int64) (*types.Book
 
 func (r *BookRepository) GetAllBooks(ctx context.Context) ([]*types.Book, error) {
 	var books []*types.Book
-	stmt := `SELECT id, title, publish_date, created_at, isbn, pages FROM books`
+	stmt := `
+		SELECT b.id, b.title, b.publish_date, b.created_at, b.isbn, b.pages, 
+		array_agg(DISTINCT ba.author_id) as authors, array_agg(DISTINCT bg.genre_id) as genres 
+		FROM books AS b 
+		LEFT JOIN book_author AS ba on b.id = ba.book_id 
+		LEFT JOIN book_genre AS bg on b.id = bg.book_id
+		GROUP BY b.id`
+
 	rows, err := r.db.QueryContext(ctx, stmt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -136,11 +145,28 @@ func (r *BookRepository) GetAllBooks(ctx context.Context) ([]*types.Book, error)
 	defer rows.Close()
 
 	for rows.Next() {
+		var customDate time.Time
 		var book types.Book
-		err := rows.Scan(&book.ID, &book.Title, &book.PublishDate, &book.CreatedAt, &book.ISBN, &book.Pages)
+		var authorsStr string
+		var genresStr string
+		err := rows.Scan(&book.ID, &book.Title, &customDate, &book.CreatedAt, &book.ISBN, &book.Pages, &authorsStr, &genresStr)
 		if err != nil {
 			return nil, err
 		}
+
+		authors, err := stringToInt64Slice(authorsStr)
+		if err != nil {
+			authors = []int64{}
+		}
+
+		genres, err := stringToInt64Slice(genresStr)
+		if err != nil {
+			genres = []int64{}
+		}
+
+		book.PublishDate = types.CustomDate{Time: customDate}
+		book.Authors = authors
+		book.Genres = genres
 		books = append(books, &book)
 	}
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
+	"github.com/tredoc/go-crud-api/internal/validator"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
 	"strconv"
@@ -21,15 +22,28 @@ func NewBookHandler(service service.Book) *BookHandler {
 }
 
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var newBook types.CreateBook
-	err := json.NewDecoder(r.Body).Decode(&newBook)
+	var book types.Book
+	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	v := validator.New()
+	types.ValidateBook(v, &book)
+	if !v.IsValid() {
+		resp, err := json.Marshal(v.Errors)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(resp)
+		return
+	}
+
 	ctx := r.Context()
-	res, err := h.service.CreateBook(ctx, &newBook)
+	res, err := h.service.CreateBook(ctx, &book)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -110,6 +124,19 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request, ps http
 	err = json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	v := validator.New()
+	types.ValidateUpdateBook(v, &book)
+	if !v.IsValid() {
+		resp, err := json.Marshal(v.Errors)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(resp)
 		return
 	}
 

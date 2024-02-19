@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/tredoc/go-crud-api/internal/repository"
 	"github.com/tredoc/go-crud-api/pkg/types"
-	"time"
 )
 
 type BookService struct {
@@ -22,7 +21,7 @@ func NewBookService(bookRepo repository.Book, authorRepo repository.Author, genr
 	}
 }
 
-func (s *BookService) CreateBook(ctx context.Context, book *types.CreateBook) (*types.BookWithDetails, error) {
+func (s *BookService) CreateBook(ctx context.Context, book *types.Book) (*types.BookWithDetails, error) {
 	id, createdAt, err := s.repo.CreateBook(ctx, book)
 	if err != nil {
 		return nil, err
@@ -38,14 +37,10 @@ func (s *BookService) CreateBook(ctx context.Context, book *types.CreateBook) (*
 		return nil, err
 	}
 
-	convertedTime, err := time.Parse(time.DateOnly, book.PublishDate)
-	if err != nil {
-		return nil, err
-	}
 	newBook := types.BookWithDetails{
 		ID:          id,
 		Title:       book.Title,
-		PublishDate: convertedTime,
+		PublishDate: book.PublishDate,
 		CreatedAt:   createdAt,
 		ISBN:        book.ISBN,
 		Pages:       book.Pages,

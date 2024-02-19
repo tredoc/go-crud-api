@@ -7,7 +7,7 @@ import (
 )
 
 type Book interface {
-	CreateBook(context.Context, *types.CreateBook) (*types.BookWithDetails, error)
+	CreateBook(context.Context, *types.Book) (*types.BookWithDetails, error)
 	GetBookByID(context.Context, int64) (*types.BookWithDetails, error)
 	GetAllBooks(context.Context) ([]*types.Book, error)
 	UpdateBook(context.Context, int64, *types.UpdateBook) (*types.Book, error)
