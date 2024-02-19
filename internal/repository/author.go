@@ -21,7 +21,7 @@ func NewAuthorRepository(db *sql.DB) *AuthorRepository {
 }
 
 func (r *AuthorRepository) CreateAuthor(ctx context.Context, author *types.Author) (int64, error) {
-	stmt := `SELECT id, first_name, middle_name, last_name FROM authors WHERE first_name = $1 AND last_name = $2`
+	stmt := `SELECT id FROM authors WHERE first_name = $1 AND last_name = $2`
 	row := r.db.QueryRowContext(ctx, stmt, author.FirstName, author.LastName)
 
 	var foundAuthorID int64

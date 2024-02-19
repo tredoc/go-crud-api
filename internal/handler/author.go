@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
+	"github.com/tredoc/go-crud-api/internal/validator"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
 	"strconv"
@@ -29,9 +30,27 @@ func (h *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request, _ h
 		return
 	}
 
+	v := validator.New()
+	types.ValidateAuthor(v, &author)
+	if !v.IsValid() {
+		resp, err := json.Marshal(v.Errors)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(resp)
+		return
+	}
+
 	ctx := r.Context()
 	res, err := h.service.CreateAuthor(ctx, &author)
 	if err != nil {
+		if errors.Is(err, service.ErrEntityExists) {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("already exists"))
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -140,6 +159,19 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, ps 
 	err = json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	v := validator.New()
+	types.ValidateUpdateAuthor(v, &author)
+	if !v.IsValid() {
+		resp, err := json.Marshal(v.Errors)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(resp)
 		return
 	}
 

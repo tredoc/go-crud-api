@@ -2,6 +2,11 @@ package validator
 
 import "regexp"
 
+var (
+	CantBeEmpty      = "can't be empty"
+	OnlyLatinLetters = "must contain only latin letters"
+)
+
 type Validator struct {
 	Errors map[string]string
 }
