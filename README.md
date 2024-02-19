@@ -29,9 +29,9 @@
 Feel free to insert db schema from txt file to dbdiagram.io to see it in a more convenient way.
 
 ### 📝How to run:
-- Configure .env.example file or use mine configuration and rename it to .env  
-- Create a database with the name you specified in the .env file
+- Configure .env.example file or use mine configuration and rename it to .env
 - Run `docker-compose up --build` to build and run the app
+- Create a database with the name you specified in the .env file
 - Install github.com/golang-migrate/migrate for migrations
 - Run `make migrate/up` to apply migrations or `make migrate/down` to rollback migrations
 
@@ -56,9 +56,9 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
     [ ] finish book transport methods
     [ ] add json validation  
     [ ] add error responses & logging
+    [ ] add tests and refactor CRUD handlers
 [ ] Add registration and authentication    
 [ ] Add authorization  
-[ ] Add unit tests  
 [ ] Add caching with Redis  
 
 [X] Add project auto rebuild

@@ -38,7 +38,7 @@ func (s *BookService) CreateBook(ctx context.Context, book *types.CreateBook) (*
 		return nil, err
 	}
 
-	convertedTime, err := time.Parse("2006-01-02", book.PublishDate)
+	convertedTime, err := time.Parse(time.DateOnly, book.PublishDate)
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +103,46 @@ func (s *BookService) GetAllBooks(ctx context.Context) ([]*types.Book, error) {
 	return books, nil
 }
 
-func (s *BookService) UpdateBook() (string, error) {
-	return s.repo.UpdateBook()
+func (s *BookService) UpdateBook(ctx context.Context, id int64, book *types.UpdateBook) (*types.Book, error) {
+	bookUPD, err := s.repo.GetBookByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	if book.Title != nil {
+		bookUPD.Title = *book.Title
+	}
+
+	if book.PublishDate != nil {
+		bookUPD.PublishDate = *book.PublishDate
+	}
+
+	if book.ISBN != nil {
+		bookUPD.ISBN = *book.ISBN
+	}
+
+	if book.Pages != nil {
+		bookUPD.Pages = *book.Pages
+	}
+
+	if book.Authors != nil {
+		bookUPD.Authors = book.Authors
+	}
+
+	if book.Genres != nil {
+		bookUPD.Genres = book.Genres
+	}
+
+	err = s.repo.UpdateBook(ctx, id, bookUPD)
+	if err != nil {
+		return nil, err
+	}
+
+	return bookUPD, nil
 }
 
 func (s *BookService) DeleteBook(ctx context.Context, id int64) error {

@@ -10,7 +10,7 @@ type Book interface {
 	CreateBook(context.Context, *types.CreateBook) (*types.BookWithDetails, error)
 	GetBookByID(context.Context, int64) (*types.BookWithDetails, error)
 	GetAllBooks(context.Context) ([]*types.Book, error)
-	UpdateBook() (string, error)
+	UpdateBook(context.Context, int64, *types.UpdateBook) (*types.Book, error)
 	DeleteBook(context.Context, int64) error
 }
 

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
 	"github.com/tredoc/go-crud-api/pkg/types"
@@ -60,6 +60,10 @@ func (h *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request, ps htt
 	ctx := r.Context()
 	book, err := h.service.GetBookByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -89,9 +93,43 @@ func (h *BookHandler) GetAllBooks(w http.ResponseWriter, r *http.Request, _ http
 	_, _ = w.Write(resp)
 }
 
-func (h *BookHandler) UpdateBook(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	res, _ := h.service.UpdateBook()
-	_, _ = fmt.Fprintf(w, res)
+func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	idStr := ps.ByName(idParam)
+	if idStr == "" {
+		http.Error(w, "missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 0 {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var book types.UpdateBook
+	err = json.NewDecoder(r.Body).Decode(&book)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res, err := h.service.UpdateBook(r.Context(), id, &book)
+	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			http.Error(w, "author not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := json.Marshal(res)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = w.Write(resp)
 }
 
 func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -110,7 +148,12 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request, ps http
 	ctx := r.Context()
 	err = h.service.DeleteBook(ctx, id)
 	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	_, _ = fmt.Fprintf(w, "success")
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -36,10 +36,10 @@ type CreateBook struct {
 }
 
 type UpdateBook struct {
-	Title       *string `json:"title"`
-	PublishDate *string `json:"publish_date"`
-	ISBN        *string `json:"isbn"`
-	Pages       *uint16 `json:"pages"`
-	Authors     []int64 `json:"authors"`
-	Genres      []int64 `json:"genres"`
+	Title       *string    `json:"title"`
+	PublishDate *time.Time `json:"publish_date"`
+	ISBN        *string    `json:"isbn"`
+	Pages       *uint16    `json:"pages"`
+	Authors     []int64    `json:"authors"`
+	Genres      []int64    `json:"genres"`
 }
