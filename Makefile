@@ -12,5 +12,17 @@ run/dev:
 	@echo "Running in development mode..."
 	@docker compose up
 
-.PHONY: migrate/up migrate/down run/dev
-.SILENT: migrate/up migrate/down run/dev
+mock/service:
+	@echo "Running mock service..."
+	@mockery --dir=internal/service --output=mocks/service --outpkg=mockservice --all
+
+mock/repository:
+	@echo "Running mock service..."
+	@mockery --dir=internal/repository --output=mocks/repository --outpkg=mockrepository --all
+
+test:
+	@echo "Running tests..."
+	@go test -v -cover ./...
+
+.PHONY: migrate/up migrate/down run/dev mock/service mock/repository
+.SILENT: migrate/up migrate/down run/dev mock/service mock/repository

@@ -51,12 +51,12 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
     [X] add author repository and service methods
     [ ] finish author transport methods
     [X] add genre repository and service methods
-    [ ] finish genre transport methods
+    [X] finish genre transport methods
     [X] add book repository and service methods
     [ ] finish book transport methods
     [X] add json validation  
-    [ ] add error responses & logging
-    [ ] add tests and refactor CRUD handlers
+    [X] add error responses & logging
+    [_] add tests and refactor CRUD handlers
 [ ] Add registration and authentication    
 [ ] Add authorization  
 [ ] Add caching with Redis  

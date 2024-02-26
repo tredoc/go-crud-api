@@ -7,9 +7,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
 	"github.com/tredoc/go-crud-api/internal/validator"
+	"github.com/tredoc/go-crud-api/pkg/log"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
-	"strconv"
 )
 
 type GenreHandler struct {
@@ -26,169 +26,124 @@ func (h *GenreHandler) CreateGenre(w http.ResponseWriter, r *http.Request, _ htt
 	var genre types.Genre
 	err := json.NewDecoder(r.Body).Decode(&genre)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		badRequestResponse(w, r, errors.New("can't decode request"))
 		return
 	}
 
 	v := validator.New()
 	types.ValidateGenre(v, &genre)
 	if !v.IsValid() {
-		resp, err := json.Marshal(v.Errors)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, _ = w.Write(resp)
+		notValidResponse(w, r, v.Errors)
 		return
 	}
 
-	ctx := r.Context()
-	res, err := h.service.CreateGenre(ctx, &genre)
+	newGenre, err := h.service.CreateGenre(r.Context(), &genre)
 	if err != nil {
 		if errors.Is(err, service.ErrEntityExists) {
-			http.Error(w, "genre already exists", http.StatusBadRequest)
+			badRequestResponse(w, r, fmt.Errorf("genre '%s' already exists", genre.Name))
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		badRequestResponse(w, r, errors.New("couldn't create new genre"))
 		return
 	}
 
-	resp, err := json.Marshal(res)
+	err = writeJSON(w, http.StatusCreated, envelope{"genre": newGenre}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-	_, _ = fmt.Fprint(w, string(resp))
 }
 
 func (h *GenreHandler) GetGenreByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idStr := ps.ByName(idParam)
-	if idStr == "" {
-		http.Error(w, "missing id parameter", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id < 0 {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	ctx := r.Context()
-	genre, err := h.service.GetGenreByID(ctx, id)
+	id, err := getIdParam(ps)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		badRequestResponse(w, r, err)
+	}
+
+	genre, err := h.service.GetGenreByID(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			notFoundResponse(w, r)
+			return
+		}
+		serverErrorResponse(w, r, err)
 		return
 	}
 
-	resp, err := json.Marshal(genre)
+	err = writeJSON(w, http.StatusOK, envelope{"genre": genre}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-	_, _ = fmt.Fprint(w, string(resp))
 }
 
 func (h *GenreHandler) GetAllGenres(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var genres []*types.Genre
-	ctx := r.Context()
-	genres, err := h.service.GetAllGenres(ctx)
+	genres, err := h.service.GetAllGenres(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, service.ErrNotFound) {
+			notFoundResponse(w, r)
+			return
+		}
+		serverErrorResponse(w, r, err)
 		return
 	}
 
-	if genres == nil {
-		_, _ = fmt.Fprint(w, "[]")
-		return
-	}
-
-	resp, err := json.Marshal(genres)
+	err = writeJSON(w, http.StatusOK, envelope{"genres": genres}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-	_, _ = fmt.Fprint(w, string(resp))
 }
 
 func (h *GenreHandler) UpdateGenre(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idStr := ps.ByName(idParam)
-	if idStr == "" {
-		http.Error(w, "missing id parameter", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id < 0 {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	id, err := getIdParam(ps)
+	if err != nil {
+		badRequestResponse(w, r, err)
 	}
 
 	var genre types.Genre
 	err = json.NewDecoder(r.Body).Decode(&genre)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		badRequestResponse(w, r, errors.New("can't decode request"))
 		return
 	}
 
 	v := validator.New()
 	types.ValidateGenre(v, &genre)
 	if !v.IsValid() {
-		resp, err := json.Marshal(v.Errors)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, _ = w.Write(resp)
+		notValidResponse(w, r, v.Errors)
 		return
 	}
 
-	ctx := r.Context()
-	err = h.service.UpdateGenre(ctx, id, &genre)
+	err = h.service.UpdateGenre(r.Context(), id, &genre)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
-			http.Error(w, "no genre with such id", http.StatusBadRequest)
+			notFoundResponse(w, r)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverErrorResponse(w, r, err)
 		return
 	}
 
-	resp, err := json.Marshal(genre)
+	genre.ID = id
+	err = writeJSON(w, http.StatusOK, envelope{"genre": genre}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-
-	_, _ = fmt.Fprint(w, string(resp))
 }
 
 func (h *GenreHandler) DeleteGenre(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idStr := ps.ByName(idParam)
-	if idStr == "" {
-		http.Error(w, "missing id parameter", http.StatusBadRequest)
-		return
+	id, err := getIdParam(ps)
+	if err != nil {
+		badRequestResponse(w, r, err)
 	}
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id < 0 {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	ctx := r.Context()
-	err = h.service.DeleteGenre(ctx, id)
+	err = h.service.DeleteGenre(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
-			http.Error(w, "no genre with such id", http.StatusBadRequest)
+			notFoundResponse(w, r)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverErrorResponse(w, r, err)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/tredoc/go-crud-api/pkg/log"
 	"github.com/tredoc/go-crud-api/pkg/types"
@@ -31,6 +32,9 @@ func (r *GenreRepository) GetGenreByID(ctx context.Context, id int64) (*types.Ge
 	var genre types.Genre
 	err := r.db.QueryRowContext(ctx, stmt, id).Scan(&genre.ID, &genre.Name)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
 		return nil, err
 	}
 

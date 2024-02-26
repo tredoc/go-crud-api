@@ -71,7 +71,7 @@ func (s *GenreService) GetAllGenres(ctx context.Context) ([]*types.Genre, error)
 	genres, err := s.repo.GetAllGenres(ctx)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
-			return genres, nil
+			return nil, ErrNotFound
 		}
 
 		return nil, err
