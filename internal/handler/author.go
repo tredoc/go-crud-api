@@ -7,9 +7,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/internal/service"
 	"github.com/tredoc/go-crud-api/internal/validator"
+	"github.com/tredoc/go-crud-api/pkg/log"
 	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
-	"strconv"
 )
 
 type AuthorHandler struct {
@@ -26,196 +26,124 @@ func (h *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request, _ h
 	var author types.Author
 	err := json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		badRequestResponse(w, r, errors.New("can't decode request"))
 		return
 	}
 
 	v := validator.New()
 	types.ValidateAuthor(v, &author)
 	if !v.IsValid() {
-		resp, err := json.Marshal(v.Errors)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, _ = w.Write(resp)
+		notValidResponse(w, r, v.Errors)
 		return
 	}
 
-	ctx := r.Context()
-	res, err := h.service.CreateAuthor(ctx, &author)
+	newAuthor, err := h.service.CreateAuthor(r.Context(), &author)
 	if err != nil {
 		if errors.Is(err, service.ErrEntityExists) {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("already exists"))
+			badRequestResponse(w, r, fmt.Errorf("author '%s %s %s' already exists", author.FirstName, author.MiddleName, author.LastName))
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverErrorResponse(w, r, err)
 		return
 	}
 
-	resp, err := json.Marshal(res)
+	err = writeJSON(w, http.StatusCreated, envelope{"author": newAuthor}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-	_, _ = fmt.Fprint(w, string(resp))
 }
 
 func (h *AuthorHandler) GetAuthorByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idStr := ps.ByName(idParam)
-	if idStr == "" {
-		http.Error(w, "missing id parameter", http.StatusBadRequest)
+	id, err := getIdParam(ps)
+	if err != nil {
+		badRequestResponse(w, r, err)
 		return
 	}
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id < 0 {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	ctx := r.Context()
-	author, err := h.service.GetAuthorByID(ctx, id)
+	author, err := h.service.GetAuthorByID(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			notFoundResponse(w, r)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverErrorResponse(w, r, err)
+		return
 	}
 
-	resp, err := json.Marshal(author)
+	err = writeJSON(w, http.StatusOK, envelope{"author": author}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-
-	_, _ = w.Write(resp)
-}
-
-func (h *AuthorHandler) GetAuthorByName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	firstName := ps.ByName(firstNameParam)
-	lastName := ps.ByName(lastNameParam)
-
-	if firstName == "" || lastName == "" {
-		http.Error(w, "missing first_name or last_name parameter", http.StatusBadRequest)
-		return
-	}
-
-	ctx := r.Context()
-	author, err := h.service.GetAuthorByName(ctx, firstName, lastName)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	resp, err := json.Marshal(author)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	_, _ = w.Write(resp)
 }
 
 func (h *AuthorHandler) GetAllAuthors(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var authors []*types.Author
-	ctx := r.Context()
-	authors, err := h.service.GetAllAuthors(ctx)
+	authors, err := h.service.GetAllAuthors(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, service.ErrNotFound) {
+			notFoundResponse(w, r)
+			return
+		}
+		serverErrorResponse(w, r, err)
 		return
 	}
 
-	if authors == nil {
-		_, _ = fmt.Fprint(w, "[]")
-		return
-	}
-
-	resp, err := json.Marshal(authors)
+	err = writeJSON(w, http.StatusOK, envelope{"authors": authors}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-	_, _ = w.Write(resp)
 }
 
 func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idStr := ps.ByName(idParam)
-	if idStr == "" {
-		http.Error(w, "missing id parameter", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id < 0 {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	id, err := getIdParam(ps)
+	if err != nil {
+		badRequestResponse(w, r, err)
 		return
 	}
 
 	var author types.UpdateAuthor
 	err = json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		badRequestResponse(w, r, errors.New("can't decode request"))
 		return
 	}
 
 	v := validator.New()
 	types.ValidateUpdateAuthor(v, &author)
 	if !v.IsValid() {
-		resp, err := json.Marshal(v.Errors)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, _ = w.Write(resp)
+		notValidResponse(w, r, v.Errors)
 		return
 	}
 
-	ctx := r.Context()
-	updatedAuthor, err := h.service.UpdateAuthor(ctx, id, &author)
+	updatedAuthor, err := h.service.UpdateAuthor(r.Context(), id, &author)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
-			http.Error(w, "author not found", http.StatusNotFound)
+			notFoundResponse(w, r)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverErrorResponse(w, r, err)
 		return
 	}
 
-	resp, err := json.Marshal(updatedAuthor)
+	err = writeJSON(w, http.StatusOK, envelope{"author": updatedAuthor}, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Error(err.Error())
 	}
-
-	_, _ = w.Write(resp)
 }
 
 func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idStr := ps.ByName(idParam)
-	if idStr == "" {
-		http.Error(w, "missing id parameter", http.StatusBadRequest)
+	id, err := getIdParam(ps)
+	if err != nil {
+		badRequestResponse(w, r, err)
 		return
 	}
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id < 0 {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	ctx := r.Context()
-	err = h.service.DeleteAuthor(ctx, id)
+	err = h.service.DeleteAuthor(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
-			http.Error(w, "no author with such id", http.StatusBadRequest)
+			notFoundResponse(w, r)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverErrorResponse(w, r, err)
 		return
 	}
 

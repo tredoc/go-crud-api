@@ -96,7 +96,7 @@ func (s *genreHandlerSuite) TestGetGenreByID_Positive() {
 }
 
 func (s *genreHandlerSuite) TestGetAllGenres_Positive() {
-	genres := []*types.Genre{&types.Genre{ID: 1, Name: "medicine"}, &types.Genre{ID: 2, Name: "programming"}}
+	genres := []*types.Genre{{ID: 1, Name: "medicine"}, {ID: 2, Name: "programming"}}
 
 	s.usecase.On("GetAllGenres", mock.AnythingOfType("*context.cancelCtx")).Return(genres, nil)
 

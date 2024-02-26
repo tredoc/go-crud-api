@@ -43,7 +43,7 @@ func (h *GenreHandler) CreateGenre(w http.ResponseWriter, r *http.Request, _ htt
 			badRequestResponse(w, r, fmt.Errorf("genre '%s' already exists", genre.Name))
 			return
 		}
-		badRequestResponse(w, r, errors.New("couldn't create new genre"))
+		serverErrorResponse(w, r, err)
 		return
 	}
 
@@ -133,6 +133,7 @@ func (h *GenreHandler) DeleteGenre(w http.ResponseWriter, r *http.Request, ps ht
 	id, err := getIdParam(ps)
 	if err != nil {
 		badRequestResponse(w, r, err)
+		return
 	}
 
 	err = h.service.DeleteGenre(r.Context(), id)

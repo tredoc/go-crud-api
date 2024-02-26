@@ -32,8 +32,12 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 - Configure .env.example file or use mine configuration and rename it to .env
 - Run `docker-compose up --build` to build and run the app
 - Create a database with the name you specified in the .env file
-- Install github.com/golang-migrate/migrate for migrations
+- Install `github.com/golang-migrate/migrate` for migrations
 - Run `make migrate/up` to apply migrations or `make migrate/down` to rollback migrations
+- Install `go install github.com/vektra/mockery/v2@v2.42.0` for mock generation
+- Run `mock/service` to generate mock files for services
+- Run `make test` to run tests
+- Run `make run/dev` to run the app in dev mode
 
 ## ✅Flow:
 ```
@@ -49,7 +53,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [X] Add migration  
 [_] Finish CRUD handlers
     [X] add author repository and service methods
-    [ ] finish author transport methods
+    [X] finish author transport methods
     [X] add genre repository and service methods
     [X] finish genre transport methods
     [X] add book repository and service methods

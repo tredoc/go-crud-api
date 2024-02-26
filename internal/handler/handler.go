@@ -31,7 +31,6 @@ type Genre interface {
 type Author interface {
 	CreateAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetAuthorByID(http.ResponseWriter, *http.Request, httprouter.Params)
-	GetAuthorByName(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetAllAuthors(http.ResponseWriter, *http.Request, httprouter.Params)
 	UpdateAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
 	DeleteAuthor(http.ResponseWriter, *http.Request, httprouter.Params)
