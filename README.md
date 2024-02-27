@@ -51,22 +51,24 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
 [X] Dockerize the go app and postgresql  
 [X] Add configuration  
 [X] Add migration  
-[_] Finish CRUD handlers
+[X] Finish CRUD handlers
     [X] add author repository and service methods
     [X] finish author transport methods
     [X] add genre repository and service methods
     [X] finish genre transport methods
     [X] add book repository and service methods
-    [ ] finish book transport methods
+    [X] finish book transport methods
     [X] add json validation  
     [X] add error responses & logging
-    [_] add tests and refactor CRUD handlers
+    [X] add tests and refactor CRUD handlers
 [ ] Add registration and authentication    
 [ ] Add authorization  
 [ ] Add caching with Redis  
 
-[X] Add project auto rebuild
-[ ] Add swagger
+[X] Add project auto rebuild  
+[ ] Move to 1.22 native router  
+[ ] Add db constraints for isbn, authors, genres and etc  
+[ ] Add swagger  
 
 To Be Continued...
 ```

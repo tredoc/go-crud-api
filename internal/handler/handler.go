@@ -6,12 +6,6 @@ import (
 	"net/http"
 )
 
-var (
-	idParam        string = "id"
-	firstNameParam string = "first_name"
-	lastNameParam  string = "last_name"
-)
-
 type Book interface {
 	CreateBook(http.ResponseWriter, *http.Request, httprouter.Params)
 	GetBookByID(http.ResponseWriter, *http.Request, httprouter.Params)
