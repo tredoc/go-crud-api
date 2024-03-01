@@ -61,12 +61,14 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
     [X] add json validation  
     [X] add error responses & logging
     [X] add tests and refactor CRUD handlers
-[ ] Add registration and authentication    
+[_] Add registration and authentication    
 [ ] Add authorization  
 [ ] Add caching with Redis  
 
 [X] Add project auto rebuild  
 [ ] Move to 1.22 native router  
+[ ] Add graceful shutdown
+[ ] Add pagination, sorting and filtration  
 [ ] Add db constraints for isbn, authors, genres and etc  
 [ ] Add swagger  
 

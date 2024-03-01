@@ -34,10 +34,16 @@ type Author interface {
 	DeleteAuthor(context.Context, int64) error
 }
 
+type User interface {
+	CreateUser(context.Context, string, []byte) (int64, time.Time, error)
+	GetUserByEmail(context.Context, string) (*types.User, string, error)
+}
+
 type Repository struct {
 	Book
 	Genre
 	Author
+	User
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -45,5 +51,6 @@ func NewRepository(db *sql.DB) *Repository {
 		Book:   NewBookRepository(db),
 		Genre:  NewGenreRepository(db),
 		Author: NewAuthorRepository(db),
+		User:   NewUserRepository(db),
 	}
 }

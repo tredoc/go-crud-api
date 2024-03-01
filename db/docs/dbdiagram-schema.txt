@@ -36,3 +36,14 @@ Table book_author {
     (book_id, author_id) [unique]
   }
 }
+
+Table users {
+  id bigserial [pk]
+  email varchar(255) [not null]
+  created_at datetime [default: `now()`]
+  password varchar(255) [not null]
+
+  Indexes {
+    (email) [unique]
+  }
+}

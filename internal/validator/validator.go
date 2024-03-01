@@ -8,6 +8,7 @@ var (
 	OnlyInThePast      = "publish date can't be in future"
 	CantBeLessThanOne  = "can't be less than 1"
 	CantBeBiggerThan5k = "must be less than 5000"
+	CantBeShorterThan6 = "can't be shorter than 6"
 )
 
 type Validator struct {

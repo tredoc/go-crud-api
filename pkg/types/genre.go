@@ -11,6 +11,6 @@ type Genre struct {
 }
 
 func ValidateGenre(v *validator.Validator, genre *Genre) {
-	v.Check(len(genre.Name) > 0, "name", "can't be empty")
+	v.Check(len(genre.Name) > 0, "name", validator.CantBeEmpty)
 	v.Check(v.Matches(genre.Name, regexp.MustCompile(`^[a-zA-Z]+$`)), "name", "should contain only latin letters")
 }
