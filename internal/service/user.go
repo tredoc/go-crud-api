@@ -3,8 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/pascaldekloe/jwt"
 	"github.com/tredoc/go-crud-api/internal/repository"
 	"github.com/tredoc/go-crud-api/pkg/types"
+	"log"
+	"os"
+	"strconv"
+	"time"
 )
 
 type UserService struct {
@@ -42,7 +47,7 @@ func (s *UserService) RegisterUser(ctx context.Context, authUser *types.AuthUser
 }
 
 func (s *UserService) LoginUser(ctx context.Context, authUser *types.AuthUser) (types.AccessToken, error) {
-	_, pwd, err := s.repo.GetUserByEmail(ctx, authUser.Email)
+	user, pwd, err := s.repo.GetUserByEmail(ctx, authUser.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			return "", ErrNotFound
@@ -53,10 +58,6 @@ func (s *UserService) LoginUser(ctx context.Context, authUser *types.AuthUser) (
 	password := types.Password{
 		Hash: []byte(pwd),
 	}
-	if err != nil {
-		return "", ErrCantHandleCredentials
-	}
-
 	isMatch, err := password.Matches(authUser.Password)
 	if err != nil {
 		return "", err
@@ -66,5 +67,34 @@ func (s *UserService) LoginUser(ctx context.Context, authUser *types.AuthUser) (
 		return "", ErrCredentialsMismatch
 	}
 
-	return "generated access token", nil
+	var claims jwt.Claims
+	claims.Subject = strconv.FormatInt(user.ID, 10)
+	claims.Issued = jwt.NewNumericTime(time.Now())
+	claims.NotBefore = jwt.NewNumericTime(time.Now())
+	claims.Expires = jwt.NewNumericTime(time.Now().Add(types.EXPIRATION))
+	claims.Issuer = "go-crud-api"
+	claims.Audiences = []string{"go-crud-api"}
+
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Panic("secret is unavailable")
+	}
+	jwtBytes, err := claims.HMACSign(jwt.HS256, []byte(secret))
+	if err != nil {
+		return "", err
+	}
+
+	return types.AccessToken(jwtBytes), nil
+}
+
+func (s *UserService) GetUserByID(ctx context.Context, id int64) (*types.User, error) {
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+
+	return user, nil
 }

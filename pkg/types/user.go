@@ -10,10 +10,20 @@ import (
 
 const COST = 10
 
+type contextKey string
+
+const UserContextKey = contextKey("user")
+
 type User struct {
 	ID        int64     `json:"id,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	Email     string    `json:"email"`
+}
+
+var AnonymousUser = &User{}
+
+func (u *User) IsAnonymous() bool {
+	return u == AnonymousUser
 }
 
 type Password struct {
@@ -49,8 +59,6 @@ type AuthUser struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-
-type AccessToken string
 
 func ValidateRegisterUser(v *validator.Validator, user *AuthUser) {
 	v.Check(len(user.Email) > 0, "email", validator.CantBeEmpty)

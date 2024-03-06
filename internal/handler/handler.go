@@ -35,11 +35,16 @@ type User interface {
 	LoginUser(http.ResponseWriter, *http.Request, httprouter.Params)
 }
 
+type Middlewares interface {
+	authMiddleware(httprouter.Handle) httprouter.Handle
+}
+
 type Handler struct {
 	book   Book
 	genre  Genre
 	author Author
 	user   User
+	mw     Middlewares
 }
 
 func NewHandler(services *service.Service) *Handler {
@@ -48,13 +53,17 @@ func NewHandler(services *service.Service) *Handler {
 		genre:  NewGenreHandler(services.Genre),
 		author: NewAuthorHandler(services.Author),
 		user:   NewUserHandler(services.User),
+		mw:     NewMiddleware(services.User),
 	}
 }
 
 func (h *Handler) InitRoutes() *httprouter.Router {
 	router := httprouter.New()
 
-	router.POST("/api/v1/books", h.book.CreateBook)
+	router.NotFound = http.HandlerFunc(notFoundResponse)
+	router.MethodNotAllowed = http.HandlerFunc(notAllowedResponse)
+
+	router.POST("/api/v1/books", h.mw.authMiddleware(h.book.CreateBook))
 	router.GET("/api/v1/books", h.book.GetAllBooks)
 	router.GET("/api/v1/books/:id", h.book.GetBookByID)
 	router.PATCH("/api/v1/books/:id", h.book.UpdateBook)

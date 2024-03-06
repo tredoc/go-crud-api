@@ -61,7 +61,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
     [X] add json validation  
     [X] add error responses & logging
     [X] add tests and refactor CRUD handlers
-[_] Add registration and authentication    
+[X] Add registration and authentication    
 [ ] Add authorization  
 [ ] Add caching with Redis  
 

@@ -37,6 +37,7 @@ type Author interface {
 type User interface {
 	CreateUser(context.Context, string, []byte) (int64, time.Time, error)
 	GetUserByEmail(context.Context, string) (*types.User, string, error)
+	GetUserByID(context.Context, int64) (*types.User, error)
 }
 
 type Repository struct {

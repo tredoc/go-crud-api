@@ -35,6 +35,7 @@ type Author interface {
 type User interface {
 	RegisterUser(context.Context, *types.AuthUser) (*types.User, error)
 	LoginUser(context.Context, *types.AuthUser) (types.AccessToken, error)
+	GetUserByID(context.Context, int64) (*types.User, error)
 }
 
 type Service struct {

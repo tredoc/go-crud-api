@@ -68,17 +68,17 @@ func (h *UserHandler) LoginUser(w http.ResponseWriter, r *http.Request, _ httpro
 		return
 	}
 
-	accessToken, err := h.service.LoginUser(r.Context(), &user)
+	token, err := h.service.LoginUser(r.Context(), &user)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) || errors.Is(err, service.ErrCredentialsMismatch) {
-			badRequestResponse(w, r, errors.New("bad credentials"))
+			invalidCredentialsResponse(w, r)
 			return
 		}
 		serverErrorResponse(w, r, err)
 		return
 	}
 
-	err = writeJSON(w, http.StatusOK, envelope{"accessToken": accessToken}, nil)
+	err = writeJSON(w, http.StatusOK, envelope{"access_token": token}, nil)
 	if err != nil {
 		log.Error(err.Error())
 	}

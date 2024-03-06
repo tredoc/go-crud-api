@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tredoc/go-crud-api/pkg/log"
+	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
 	"strconv"
 )
@@ -76,4 +78,20 @@ func notAllowedResponse(w http.ResponseWriter, r *http.Request) {
 
 func notValidResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
 	errorResponse(w, r, http.StatusUnprocessableEntity, errors)
+}
+
+func invalidCredentialsResponse(w http.ResponseWriter, r *http.Request) {
+	message := "invalid authentication credentials"
+	errorResponse(w, r, http.StatusUnauthorized, message)
+}
+
+func invalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("WWW-Authenticate", "Bearer")
+	message := "invalid or missing authentication token"
+	errorResponse(w, r, http.StatusUnauthorized, message)
+}
+
+func contextSetUser(r *http.Request, user *types.User) *http.Request {
+	ctx := context.WithValue(r.Context(), types.UserContextKey, user)
+	return r.WithContext(ctx)
 }
