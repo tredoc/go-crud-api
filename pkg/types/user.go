@@ -10,6 +10,13 @@ import (
 
 const COST = 10
 
+type Role string
+
+const (
+	AdminRole Role = "admin"
+	UserRole  Role = "user"
+)
+
 type contextKey string
 
 const UserContextKey = contextKey("user")
@@ -18,6 +25,7 @@ type User struct {
 	ID        int64     `json:"id,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	Email     string    `json:"email"`
+	Role      Role      `json:"role"`
 }
 
 var AnonymousUser = &User{}

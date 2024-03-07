@@ -28,6 +28,8 @@
 💡Check db/docs for more info about db schema. 
 Feel free to insert db schema from txt file to dbdiagram.io to see it in a more convenient way.
 
+To generate migration use `migrate create -ext sql -dir db/migrations -seq migration_name`
+
 ### 📝How to run:
 - Configure .env.example file or use mine configuration and rename it to .env
 - Run `docker-compose up --build` to build and run the app
@@ -62,7 +64,7 @@ Feel free to insert db schema from txt file to dbdiagram.io to see it in a more 
     [X] add error responses & logging
     [X] add tests and refactor CRUD handlers
 [X] Add registration and authentication    
-[ ] Add authorization  
+[_] Add authorization  
 [ ] Add caching with Redis  
 
 [X] Add project auto rebuild  
