@@ -64,7 +64,7 @@ To generate migration use `migrate create -ext sql -dir db/migrations -seq migra
     [X] add error responses & logging
     [X] add tests and refactor CRUD handlers
 [X] Add registration and authentication    
-[_] Add authorization  
+[X] Add authorization  
 [ ] Add caching with Redis  
 
 [X] Add project auto rebuild  
