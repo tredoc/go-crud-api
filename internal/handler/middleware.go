@@ -5,6 +5,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/pascaldekloe/jwt"
 	"github.com/tredoc/go-crud-api/internal/service"
+	"github.com/tredoc/go-crud-api/pkg/types"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,12 +21,13 @@ func NewMiddleware(service service.User) *Middleware {
 	return &Middleware{service: service}
 }
 
-func (m *Middleware) authMiddleware(next httprouter.Handle) httprouter.Handle {
+func (m *Middleware) authMW(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Header().Add("Vary", "Authorization")
 		authorizationHeader := r.Header.Get("Authorization")
 		if authorizationHeader == "" {
-			invalidAuthenticationTokenResponse(w, r)
+			r = contextSetUser(r, types.AnonymousUser)
+			next(w, r, ps)
 			return
 		}
 
@@ -75,6 +77,23 @@ func (m *Middleware) authMiddleware(next httprouter.Handle) httprouter.Handle {
 		}
 
 		r = contextSetUser(r, user)
+		next(w, r, ps)
+	}
+}
+
+func (m *Middleware) adminOnlyMW(next httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		val := r.Context().Value(types.UserContextKey)
+		if val == nil {
+			insufficientPermissionsResponse(w, r)
+			return
+		}
+
+		user := val.(*types.User)
+		if user.Role != types.AdminRole {
+			insufficientPermissionsResponse(w, r)
+			return
+		}
 		next(w, r, ps)
 	}
 }

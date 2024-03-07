@@ -36,7 +36,8 @@ type User interface {
 }
 
 type Middlewares interface {
-	authMiddleware(httprouter.Handle) httprouter.Handle
+	authMW(httprouter.Handle) httprouter.Handle
+	adminOnlyMW(httprouter.Handle) httprouter.Handle
 }
 
 type Handler struct {
@@ -63,23 +64,23 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 	router.NotFound = http.HandlerFunc(notFoundResponse)
 	router.MethodNotAllowed = http.HandlerFunc(notAllowedResponse)
 
-	router.POST("/api/v1/books", h.mw.authMiddleware(h.book.CreateBook))
-	router.GET("/api/v1/books", h.book.GetAllBooks)
-	router.GET("/api/v1/books/:id", h.book.GetBookByID)
-	router.PATCH("/api/v1/books/:id", h.book.UpdateBook)
-	router.DELETE("/api/v1/books/:id", h.book.DeleteBook)
+	router.POST("/api/v1/books", h.mw.authMW(h.mw.adminOnlyMW(h.book.CreateBook)))
+	router.GET("/api/v1/books", h.mw.authMW(h.book.GetAllBooks))
+	router.GET("/api/v1/books/:id", h.mw.authMW(h.book.GetBookByID))
+	router.PATCH("/api/v1/books/:id", h.mw.authMW(h.mw.adminOnlyMW(h.book.UpdateBook)))
+	router.DELETE("/api/v1/books/:id", h.mw.authMW(h.mw.adminOnlyMW(h.book.DeleteBook)))
 
-	router.POST("/api/v1/genres", h.genre.CreateGenre)
-	router.GET("/api/v1/genres", h.genre.GetAllGenres)
-	router.GET("/api/v1/genres/:id", h.genre.GetGenreByID)
-	router.PATCH("/api/v1/genres/:id", h.genre.UpdateGenre)
-	router.DELETE("/api/v1/genres/:id", h.genre.DeleteGenre)
+	router.POST("/api/v1/genres", h.mw.authMW(h.mw.adminOnlyMW(h.genre.CreateGenre)))
+	router.GET("/api/v1/genres", h.mw.authMW(h.genre.GetAllGenres))
+	router.GET("/api/v1/genres/:id", h.mw.authMW(h.genre.GetGenreByID))
+	router.PATCH("/api/v1/genres/:id", h.mw.authMW(h.mw.adminOnlyMW(h.genre.UpdateGenre)))
+	router.DELETE("/api/v1/genres/:id", h.mw.authMW(h.mw.adminOnlyMW(h.genre.DeleteGenre)))
 
-	router.POST("/api/v1/authors", h.author.CreateAuthor)
-	router.GET("/api/v1/authors", h.author.GetAllAuthors)
-	router.GET("/api/v1/authors/:id", h.author.GetAuthorByID)
-	router.PATCH("/api/v1/authors/:id", h.author.UpdateAuthor)
-	router.DELETE("/api/v1/authors/:id", h.author.DeleteAuthor)
+	router.POST("/api/v1/authors", h.mw.authMW(h.mw.adminOnlyMW(h.author.CreateAuthor)))
+	router.GET("/api/v1/authors", h.mw.authMW(h.author.GetAllAuthors))
+	router.GET("/api/v1/authors/:id", h.mw.authMW(h.author.GetAuthorByID))
+	router.PATCH("/api/v1/authors/:id", h.mw.authMW(h.mw.adminOnlyMW(h.author.UpdateAuthor)))
+	router.DELETE("/api/v1/authors/:id", h.mw.authMW(h.mw.adminOnlyMW(h.author.DeleteAuthor)))
 
 	router.POST("/auth/register", h.user.RegisterUser)
 	router.POST("/auth/login", h.user.LoginUser)

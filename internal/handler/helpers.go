@@ -91,6 +91,11 @@ func invalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) 
 	errorResponse(w, r, http.StatusUnauthorized, message)
 }
 
+func insufficientPermissionsResponse(w http.ResponseWriter, r *http.Request) {
+	message := "insufficient permissions to perform the requested operation"
+	errorResponse(w, r, http.StatusUnauthorized, message)
+}
+
 func contextSetUser(r *http.Request, user *types.User) *http.Request {
 	ctx := context.WithValue(r.Context(), types.UserContextKey, user)
 	return r.WithContext(ctx)
