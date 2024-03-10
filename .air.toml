@@ -1,6 +1,6 @@
 # .air.toml
 [build]
-cmd = "go build -o ./bin/app ./cmd/app"
+cmd = "go build -buildvcs=false -o ./bin/app ./cmd/app"
 bin = "bin/app"
 full_bin = "APP_ENV=development ./bin/app"
 

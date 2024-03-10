@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"github.com/joho/godotenv"
 	"os"
+	"strconv"
 )
 
 type dbConfig struct {
@@ -14,16 +16,29 @@ type dbConfig struct {
 	sslmode  string
 }
 
+type cacheConfig struct {
+	host     string
+	port     string
+	password string
+	dbs      int
+}
+
 type config struct {
-	port string
-	env  string
-	db   dbConfig
+	port  string
+	env   string
+	db    dbConfig
+	cache cacheConfig
 }
 
 func getConfig() (*config, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		return nil, err
+	}
+
+	redisDBS, err := strconv.Atoi(os.Getenv("REDIS_DBS"))
+	if err != nil {
+		return nil, errors.New("can't convert redis port to int")
 	}
 
 	return &config{
@@ -36,6 +51,12 @@ func getConfig() (*config, error) {
 			name:     os.Getenv("DB_NAME"),
 			port:     os.Getenv("DB_PORT"),
 			sslmode:  os.Getenv("SSL_MODE"),
+		},
+		cache: cacheConfig{
+			host:     os.Getenv("REDIS_HOST"),
+			port:     os.Getenv("REDIS_PORT"),
+			password: os.Getenv("REDIS_PASSWORD"),
+			dbs:      redisDBS,
 		},
 	}, nil
 }

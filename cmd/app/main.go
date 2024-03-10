@@ -14,6 +14,12 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	cache, err := runCache(cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	defer cache.Close()
+
 	db, err := runDB(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
