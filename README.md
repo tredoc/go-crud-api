@@ -65,7 +65,7 @@ To generate migration use `migrate create -ext sql -dir db/migrations -seq migra
     [X] add tests and refactor CRUD handlers
 [X] Add registration and authentication    
 [X] Add authorization  
-[_] Add caching with Redis  
+[X] Add caching with Redis  
 
 [X] Add project auto rebuild  
 [ ] Move to 1.22 native router  
