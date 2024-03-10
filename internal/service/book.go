@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/tredoc/go-crud-api/internal/cache"
 	"github.com/tredoc/go-crud-api/internal/repository"
 	"github.com/tredoc/go-crud-api/pkg/types"
 )
@@ -11,13 +13,15 @@ type BookService struct {
 	repo       repository.Book
 	authorRepo repository.Author
 	genreRepo  repository.Genre
+	cache      cache.RCache
 }
 
-func NewBookService(bookRepo repository.Book, authorRepo repository.Author, genreRepo repository.Genre) *BookService {
+func NewBookService(bookRepo repository.Book, authorRepo repository.Author, genreRepo repository.Genre, cache cache.RCache) *BookService {
 	return &BookService{
 		repo:       bookRepo,
 		authorRepo: authorRepo,
 		genreRepo:  genreRepo,
+		cache:      cache,
 	}
 }
 
@@ -52,6 +56,13 @@ func (s *BookService) CreateBook(ctx context.Context, book *types.Book) (*types.
 }
 
 func (s *BookService) GetBookByID(ctx context.Context, id int64) (*types.BookWithDetails, error) {
+	key := fmt.Sprintf("book:%d", id)
+	var bookCache types.BookWithDetails
+	err := getFromCache(s.cache.Get, key, &bookCache)
+	if err == nil {
+		return &bookCache, nil
+	}
+
 	book, err := s.repo.GetBookByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
@@ -71,7 +82,7 @@ func (s *BookService) GetBookByID(ctx context.Context, id int64) (*types.BookWit
 		return nil, err
 	}
 
-	newBook := types.BookWithDetails{
+	bookWithDetails := types.BookWithDetails{
 		ID:          id,
 		Title:       book.Title,
 		PublishDate: book.PublishDate,
@@ -82,10 +93,18 @@ func (s *BookService) GetBookByID(ctx context.Context, id int64) (*types.BookWit
 		Genres:      genres,
 	}
 
-	return &newBook, nil
+	go setToCache(s.cache.Set, key, bookWithDetails, cache.EXPIRATION)
+	return &bookWithDetails, nil
 }
 
 func (s *BookService) GetAllBooks(ctx context.Context) ([]*types.Book, error) {
+	key := "books"
+	var booksCache []*types.Book
+	err := getFromCache(s.cache.Get, key, &booksCache)
+	if err == nil {
+		return booksCache, nil
+	}
+
 	books, err := s.repo.GetAllBooks(ctx)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
@@ -95,6 +114,7 @@ func (s *BookService) GetAllBooks(ctx context.Context) ([]*types.Book, error) {
 		return nil, err
 	}
 
+	go setToCache(s.cache.Set, key, books, cache.EXPIRATION)
 	return books, nil
 }
 
@@ -137,9 +157,13 @@ func (s *BookService) UpdateBook(ctx context.Context, id int64, book *types.Upda
 		return nil, err
 	}
 
+	go s.cache.Invalidate("books")
+	go s.cache.Invalidate(fmt.Sprintf("book:%d", id))
 	return bookUPD, nil
 }
 
 func (s *BookService) DeleteBook(ctx context.Context, id int64) error {
+	go s.cache.Invalidate("books")
+	go s.cache.Invalidate(fmt.Sprintf("book:%d", id))
 	return s.repo.DeleteBook(ctx, id)
 }

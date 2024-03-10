@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/tredoc/go-crud-api/internal/cache"
 	"github.com/tredoc/go-crud-api/internal/repository"
 	"github.com/tredoc/go-crud-api/pkg/types"
 )
@@ -45,11 +46,11 @@ type Service struct {
 	User
 }
 
-func NewService(repos *repository.Repository) *Service {
+func NewService(repos *repository.Repository, cache *cache.Cache) *Service {
 	return &Service{
-		Book:   NewBookService(repos.Book, repos.Author, repos.Genre),
-		Genre:  NewGenreService(repos.Genre),
-		Author: NewAuthorService(repos.Author),
+		Book:   NewBookService(repos.Book, repos.Author, repos.Genre, cache.Redis),
+		Genre:  NewGenreService(repos.Genre, cache.Redis),
+		Author: NewAuthorService(repos.Author, cache.Redis),
 		User:   NewUserService(repos.User),
 	}
 }

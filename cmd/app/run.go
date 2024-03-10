@@ -27,7 +27,7 @@ func runDB(cfg *config) (*sql.DB, error) {
 	return db, nil
 }
 
-func runCache(cfg *config) (*redis.Client, error) {
+func runRCache(cfg *config) (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", cfg.cache.host, cfg.cache.port),
 		Password: cfg.cache.password,
