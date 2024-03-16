@@ -51,7 +51,7 @@ func (s *BookService) CreateBook(ctx context.Context, book *types.Book) (*types.
 		Authors:     authors,
 		Genres:      genres,
 	}
-
+	go s.cache.Invalidate("books")
 	return &newBook, nil
 }
 

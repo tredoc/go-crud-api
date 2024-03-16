@@ -42,6 +42,7 @@ func (s *GenreService) CreateGenre(ctx context.Context, genre *types.Genre) (*ty
 	}
 
 	genre.ID = id
+	go s.cache.Invalidate("genres")
 	return genre, nil
 }
 

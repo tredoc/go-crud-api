@@ -32,6 +32,7 @@ func (s *AuthorService) CreateAuthor(ctx context.Context, author *types.Author) 
 	}
 
 	author.ID = id
+	go s.cache.Invalidate("authors")
 	return author, nil
 }
 
