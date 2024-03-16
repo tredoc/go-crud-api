@@ -25,21 +25,28 @@
 - Unit tests
 
 ---
-💡Check db/docs for more info about db schema. 
-Feel free to insert db schema from txt file to dbdiagram.io to see it in a more convenient way.
+💡Check docs/db for more info about db schema. 
+Feel free to insert db schema from txt file to dbdiagram.io to see it or edit in a more convenient way.
 
 To generate migration use `migrate create -ext sql -dir db/migrations -seq migration_name`
 
 ### 📝How to run:
-- Configure .env.example file or use mine configuration and rename it to .env
+- Configure .env file or use mine configuration .env.example and rename it to .env
 - Run `docker-compose up --build` to build and run the app
 - Create a database with the name you specified in the .env file
 - Install `github.com/golang-migrate/migrate` for migrations
 - Run `make migrate/up` to apply migrations or `make migrate/down` to rollback migrations
+- Run `make run/dev` to run the app in dev mode
+
+### 📝How to swag:
+- Run `go install github.com/swaggo/swag/cmd/swag@latest` to install swagger
+- Run `make swag` in project root to generate swagger documentation
+- Open `http://localhost:{YOUR_PORT}/swagger/index.html` to see swagger documentation
+
+### 📝How to test:
 - Install `go install github.com/vektra/mockery/v2@v2.42.0` for mock generation
 - Run `mock/service` to generate mock files for services
 - Run `make test` to run tests
-- Run `make run/dev` to run the app in dev mode
 
 ## ✅Flow:
 ```
@@ -72,7 +79,7 @@ To generate migration use `migrate create -ext sql -dir db/migrations -seq migra
 [ ] Add graceful shutdown
 [ ] Add pagination, sorting and filtration  
 [ ] Add db constraints for isbn, authors, genres and etc  
-[ ] Add swagger  
+[X] Add swagger  
 
 To Be Continued...
 ```

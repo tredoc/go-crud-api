@@ -9,6 +9,17 @@ import (
 	"github.com/tredoc/go-crud-api/pkg/log"
 )
 
+// @title Swagger go-crud-api API
+// @version 4.0
+// @description personal educational project
+
+// @host localhost:3000
+// @BasePath /
+
+// @SecurityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+
 func main() {
 	cfg, err := getConfig()
 	if err != nil {

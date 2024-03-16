@@ -1,0 +1,519 @@
+basePath: /
+definitions:
+  types.AuthUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  types.Author:
+    properties:
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      middle_name:
+        type: string
+    type: object
+  types.Book:
+    properties:
+      authors:
+        items:
+          type: integer
+        type: array
+      created_at:
+        type: string
+      genres:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      isbn:
+        type: string
+      pages:
+        type: integer
+      publish_date:
+        $ref: '#/definitions/types.CustomDate'
+      title:
+        type: string
+    type: object
+  types.BookWithDetails:
+    properties:
+      authors:
+        items:
+          $ref: '#/definitions/types.Author'
+        type: array
+      created_at:
+        type: string
+      genres:
+        items:
+          $ref: '#/definitions/types.Genre'
+        type: array
+      id:
+        type: integer
+      isbn:
+        type: string
+      pages:
+        type: integer
+      publish_date:
+        $ref: '#/definitions/types.CustomDate'
+      title:
+        type: string
+    type: object
+  types.CustomDate:
+    properties:
+      time.Time:
+        type: string
+    type: object
+  types.Genre:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  types.UpdateAuthor:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      middle_name:
+        type: string
+    type: object
+  types.UpdateBook:
+    properties:
+      authors:
+        items:
+          type: integer
+        type: array
+      genres:
+        items:
+          type: integer
+        type: array
+      isbn:
+        type: string
+      pages:
+        type: integer
+      publish_date:
+        $ref: '#/definitions/types.CustomDate'
+      title:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: personal educational project
+  title: Swagger go-crud-api API
+  version: "4.0"
+paths:
+  /api/v1/authors:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all authors
+      operationId: get-all-authors
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/types.Author'
+              type: array
+            type: array
+      summary: Get all authors
+      tags:
+      - authors
+    post:
+      consumes:
+      - application/json
+      description: Create a new author with the input payload
+      operationId: create-author
+      parameters:
+      - description: Author object that needs to be added
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/types.Author'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.Author'
+      security:
+      - Bearer: []
+      summary: Create a new author
+      tags:
+      - authors
+  /api/v1/authors/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an author with a specific ID
+      operationId: delete-author
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - Bearer: []
+      summary: Delete an author
+      tags:
+      - authors
+    get:
+      consumes:
+      - application/json
+      description: Get details of an author by ID
+      operationId: get-author-by-id
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Author'
+      summary: Get details of an author
+      tags:
+      - authors
+    put:
+      consumes:
+      - application/json
+      description: Update an author with a specific ID
+      operationId: update-author
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Author object that needs to be updated
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateAuthor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Author'
+      security:
+      - Bearer: []
+      summary: Update an author
+      tags:
+      - authors
+  /api/v1/books:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all books
+      operationId: get-all-books
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/types.Book'
+              type: array
+            type: array
+      summary: Get all books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Create a new book with the provided details
+      operationId: create-book
+      parameters:
+      - description: Book object that needs to be added
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/types.Book'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.BookWithDetails'
+      security:
+      - Bearer: []
+      summary: Create a new book
+      tags:
+      - books
+  /api/v1/books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a book with a specific ID
+      operationId: delete-book
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - Bearer: []
+      summary: Delete a book
+      tags:
+      - books
+    get:
+      consumes:
+      - application/json
+      description: Get details of a book
+      operationId: get-book
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Token:
+              description: qwerty
+              type: string
+          schema:
+            $ref: '#/definitions/types.BookWithDetails'
+      summary: Get details of a book
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: Update a book with a specific ID
+      operationId: update-book
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Book object that needs to be updated
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Book'
+      security:
+      - Bearer: []
+      summary: Update a book
+      tags:
+      - books
+  /api/v1/genres:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all genres
+      operationId: get-all-genres
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/types.Genre'
+              type: array
+            type: array
+      summary: Get all genres
+      tags:
+      - genres
+    post:
+      consumes:
+      - application/json
+      description: Create a new genre with the input payload
+      operationId: create-genre
+      parameters:
+      - description: Genre object that needs to be added
+        in: body
+        name: genre
+        required: true
+        schema:
+          $ref: '#/definitions/types.Genre'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.Genre'
+      security:
+      - Bearer: []
+      summary: Create a new genre
+      tags:
+      - genres
+  /api/v1/genres/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a genre with a specific ID
+      operationId: delete-genre
+      parameters:
+      - description: Genre ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - Bearer: []
+      summary: Delete a genre
+      tags:
+      - genres
+    get:
+      consumes:
+      - application/json
+      description: Get details of a genre by ID
+      operationId: get-genre-by-id
+      parameters:
+      - description: Genre ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Genre'
+      summary: Get details of a genre
+      tags:
+      - genres
+    put:
+      consumes:
+      - application/json
+      description: Update a genre with a specific ID
+      operationId: update-genre
+      parameters:
+      - description: Genre ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Genre object that needs to be updated
+        in: body
+        name: genre
+        required: true
+        schema:
+          $ref: '#/definitions/types.Genre'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Genre'
+      security:
+      - Bearer: []
+      summary: Update a genre
+      tags:
+      - genres
+  /api/v1/users/login:
+    post:
+      consumes:
+      - application/json
+      description: Log in a user with the input payload
+      operationId: login-user
+      parameters:
+      - description: User object that needs to log in
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.AuthUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{ \"access_token\": \"token\" }'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Log in a user
+      tags:
+      - user
+  /api/v1/users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the input payload
+      operationId: register-user
+      parameters:
+      - description: User object that needs to be registered
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.AuthUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.AuthUser'
+      summary: Register a new user
+      tags:
+      - user
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

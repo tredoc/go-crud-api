@@ -24,5 +24,9 @@ test:
 	@echo "Running tests..."
 	@go test -v -cover ./...
 
-.PHONY: migrate/up migrate/down run/dev mock/service mock/repository
-.SILENT: migrate/up migrate/down run/dev mock/service mock/repository
+swag:
+	@echo "Generating swagger..."
+	@swag init -o ./docs/swagger -g ./cmd/app/main.go
+
+.PHONY: migrate/up migrate/down run/dev mock/service mock/repository swag
+.SILENT: migrate/up migrate/down run/dev mock/service mock/repository swag

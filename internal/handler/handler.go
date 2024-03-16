@@ -2,8 +2,11 @@ package handler
 
 import (
 	"github.com/julienschmidt/httprouter"
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "github.com/tredoc/go-crud-api/docs/swagger"
 	"github.com/tredoc/go-crud-api/internal/service"
 	"net/http"
+	"os"
 )
 
 type Book interface {
@@ -63,6 +66,12 @@ func (h *Handler) InitRoutes() *httprouter.Router {
 
 	router.NotFound = http.HandlerFunc(notFoundResponse)
 	router.MethodNotAllowed = http.HandlerFunc(notAllowedResponse)
+
+	if os.Getenv("ENV") == "dev" {
+		router.GET("/swagger/:any", func(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+			httpSwagger.WrapHandler(res, req)
+		})
+	}
 
 	router.POST("/api/v1/books", h.mw.authMW(h.mw.adminOnlyMW(h.book.CreateBook)))
 	router.GET("/api/v1/books", h.mw.authMW(h.book.GetAllBooks))
