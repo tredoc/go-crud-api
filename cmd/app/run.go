@@ -3,11 +3,16 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"github.com/tredoc/go-crud-api/internal/handler"
 	"github.com/tredoc/go-crud-api/pkg/log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func runDB(cfg *config) (*sql.DB, error) {
@@ -48,6 +53,25 @@ func runServer(cfg *config, handlers *handler.Handler) error {
 		Handler: handlers.InitRoutes(),
 	}
 
-	log.Info(fmt.Sprintf("starting %s server on %s port", cfg.env, cfg.port))
-	return srv.ListenAndServe()
+	go func() {
+		log.Info(fmt.Sprintf("starting %s server on %s port", cfg.env, cfg.port))
+		err := srv.ListenAndServe()
+		if err != nil {
+			log.Error("starting server error:", "error", err.Error())
+		}
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	<-stop
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Error("server Shutdown Failed: ", err.Error())
+	}
+
+	return errors.New("server gracefully stopped")
 }

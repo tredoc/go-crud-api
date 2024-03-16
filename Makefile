@@ -8,8 +8,13 @@ migrate/down:
 	@echo "Migrating down..."
 	@migrate -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@0.0.0.0:${DB_PORT}/${DB_NAME}?sslmode=${SSL_MODE}" -path ./db/migrations down
 
+build:
+	@echo "Building..."
+	@GOOS=linux GOARCH=amd64 go build -o ./bin/main ./cmd/app
+
 run/dev:
 	@echo "Running in development mode..."
+	@GOOS=linux GOARCH=amd64 go build -o ./bin/main ./cmd/app
 	@docker compose up
 
 mock/service:
