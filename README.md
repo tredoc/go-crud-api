@@ -74,9 +74,8 @@ To generate migration use `migrate create -ext sql -dir db/migrations -seq migra
 [X] Add authorization  
 [X] Add caching with Redis  
 
-[X] Add project auto rebuild  
 [ ] Move to 1.22 native router  
-[ ] Add graceful shutdown
+[X] Add graceful shutdown
 [ ] Add pagination, sorting and filtration  
 [ ] Add db constraints for isbn, authors, genres and etc  
 [X] Add swagger  

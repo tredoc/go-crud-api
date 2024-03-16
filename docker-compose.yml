@@ -6,6 +6,7 @@ services:
     container_name: "book-crud-db"
     ports:
       - "${DB_PORT}:5432"
+    stop_grace_period: 30s
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USERNAME}
@@ -20,6 +21,7 @@ services:
     container_name: "book-crud-redis"
     ports:
       - "${REDIS_PORT}:6379"
+    stop_grace_period: 30s
     environment:
       - REDIS_DBS=${REDIS_DBS}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -31,6 +33,7 @@ services:
   app:
     build: .
     container_name: "book-crud-app"
+    stop_grace_period: 30s
     environment:
       DB_TYPE: ${DB_TYPE}
       DB_HOST: ${DB_HOST}
@@ -46,8 +49,6 @@ services:
       - redis
     networks:
       - app-network
-    volumes:
-      - ./:/app
 
 volumes:
   database_postgres:
