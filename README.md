@@ -1,3 +1,5 @@
+[![My Skills](https://skillicons.dev/icons?i=golang,docker,postgresql,redis)](https://skillicons.dev)
+
 #  🚀Book CRUD api
 ## 💡Consider it as a junior developer testing task
 
